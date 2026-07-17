@@ -657,8 +657,15 @@ def release_frontier(project: Path) -> dict[str, Any]:
 # --- not just remember that someone tried. asmp's `ships` block says where. ---
 
 _COPY_IGNORE = shutil.ignore_patterns(
-    ".git", "node_modules", ".shipr", "dist", "build", "*.egg-info", ".DS_Store",
-    ".pytest_cache", "__pycache__",
+    ".git",
+    "node_modules",
+    ".shipr",
+    "dist",
+    "build",
+    "*.egg-info",
+    ".DS_Store",
+    ".pytest_cache",
+    "__pycache__",
 )
 
 

@@ -120,10 +120,14 @@ def main(argv: list[str] | None = None) -> None:
     p_frontier.add_argument("--project", type=Path, default=Path.cwd(), help="Project root")
     p_frontier.add_argument("--json", action="store_true", help="Output JSON")
 
-    p_store = sub.add_parser("store", help="Put a plugin INTO the eidos store (copy files + add manifest entry)")
+    p_store = sub.add_parser(
+        "store", help="Put a plugin INTO the eidos store (copy files + add manifest entry)"
+    )
     p_store.add_argument("--project", type=Path, default=Path.cwd(), help="Plugin project root")
     p_store.add_argument(
-        "--marketplace", type=Path, default=None,
+        "--marketplace",
+        type=Path,
+        default=None,
         help="Path to the eidos-marketplace checkout. Omit to read ships.marketplace_path from asmp.yaml.",
     )
     p_store.add_argument("--json", action="store_true", help="Output JSON")
