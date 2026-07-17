@@ -1,0 +1,34 @@
+{
+  "kind": {
+    "type": "forge",
+    "signals": [
+      "ships_skills",
+      "opinionated_workflow",
+      "coordinates_with_other_forges"
+    ]
+  },
+  "audit": {
+    "audited_by": "Shipr self-release packet + Eidos marketplace checks",
+    "audit_version": "STANDARD.md",
+    "grade": "PENDING"
+  },
+  "recommend": {
+    "for_projects": [
+      "release",
+      "shipping",
+      "deployment",
+      "marketplace-entry",
+      "package-publish",
+      "product-release-memory"
+    ],
+    "pairs_with": [
+      "forge-forge",
+      "ship-forge",
+      "security-forge",
+      "foss-forge",
+      "learning-forge",
+      "loss-forge"
+    ],
+    "preflight_check": "shipr frontier --json"
+  }
+}

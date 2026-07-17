@@ -1,0 +1,22 @@
+{
+  "name": "shipr",
+  "version": "0.2.0",
+  "description": "Persistent Eidos shipping operator that learns how each product ships.",
+  "author": {
+    "name": "Eidos AGI",
+    "email": "daniel@eidosagi.com",
+    "url": "https://github.com/eidos-agi"
+  },
+  "homepage": "https://github.com/eidos-agi/shipr",
+  "repository": "https://github.com/eidos-agi/shipr",
+  "license": "MIT",
+  "keywords": [
+    "shipping",
+    "release",
+    "proof",
+    "learning",
+    "eidos",
+    "grok"
+  ],
+  "skills": "./skills/"
+}

@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "shipr"
+version = "0.2.0"
+description = "Persistent Eidos shipping operator that learns how each product ships."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "Eidos AGI", email = "daniel@eidosagi.com" },
+]
+keywords = ["release", "shipping", "agents", "eidos", "automation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/eidos-agi/shipr"
+Repository = "https://github.com/eidos-agi/shipr"
+Issues = "https://github.com/eidos-agi/shipr/issues"
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[project.scripts]
+shipr = "shipr.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/shipr"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100

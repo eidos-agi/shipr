@@ -1,0 +1,46 @@
+{
+  "name": "shipr",
+  "version": "0.2.0+codex.20260622193805",
+  "description": "Persistent Eidos shipping operator that learns how each product ships.",
+  "author": {
+    "name": "Eidos AGI",
+    "email": "daniel@eidosagi.com",
+    "url": "https://github.com/eidos-agi"
+  },
+  "homepage": "https://github.com/eidos-agi/shipr",
+  "repository": "https://github.com/eidos-agi/shipr",
+  "license": "MIT",
+  "keywords": [
+    "shipping",
+    "release",
+    "proof",
+    "learning",
+    "eidos",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Shipr",
+    "shortDescription": "Learn and run product-specific release models.",
+    "longDescription": "Shipr is the persistent Eidos shipping operator. It detects how each product ships, writes durable release models, records release attempts, and keeps future releases safer by preserving proof commands, approval gates, rollback paths, and lessons learned.",
+    "developerName": "Eidos AGI",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Release Modeling",
+      "Shipping Proof",
+      "Release Memory",
+      "Approval Gates",
+      "Rollback Planning",
+      "CLI"
+    ],
+    "websiteURL": "https://github.com/eidos-agi/shipr",
+    "privacyPolicyURL": "https://github.com/eidos-agi/shipr/blob/main/SECURITY.md",
+    "termsOfServiceURL": "https://github.com/eidos-agi/shipr",
+    "defaultPrompt": [
+      "Use Shipr to detect this product's release model.",
+      "Use Shipr to record this release attempt.",
+      "Use Shipr to show the current release frontier."
+    ],
+    "brandColor": "#0EA5E9"
+  }
+}
