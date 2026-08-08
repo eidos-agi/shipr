@@ -1,0 +1,26 @@
+{
+  "name": "shipr",
+  "owner": {
+    "name": "Eidos AGI",
+    "email": "daniel@eidosagi.com"
+  },
+  "plugins": [
+    {
+      "name": "shipr",
+      "description": "Persistent Eidos shipping operator that learns how each product ships.",
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/eidos-agi/shipr",
+      "license": "MIT",
+      "version": "0.2.1",
+      "tags": [
+        "shipping",
+        "release",
+        "proof",
+        "learning",
+        "eidos",
+        "claude-code"
+      ]
+    }
+  ]
+}

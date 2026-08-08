@@ -1,15 +1,71 @@
 import json
 from pathlib import Path
 
+import shipr.core
 from shipr.core import (
+    check_marketplace_mirror,
     detect_release_model,
     ensure_shipr_ignored,
     record_attempt,
     record_eidos_ship_attempt,
     release_frontier,
+    store_to_marketplace,
     summarize_eidos_ship_report,
     write_release_model,
 )
+
+
+def test_public_project_routes_to_foss_forge(tmp_path: Path, monkeypatch) -> None:
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='demo'\nlicense={text='MIT'}\n")
+    monkeypatch.setattr(shipr.core, "_repository_visibility", lambda _root: "public")
+
+    model = detect_release_model(tmp_path)
+
+    assert model["repository_visibility"] == "public"
+    assert model["license"] == "MIT"
+    assert model["open_source_status"] == "ready"
+    assert "foss-forge" in model["forge_stack"]
+
+
+def test_public_project_without_license_routes_to_foss_repair(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(shipr.core, "_repository_visibility", lambda _root: "public")
+
+    model = detect_release_model(tmp_path)
+
+    assert model["open_source_status"] == "license-missing"
+    assert "foss-forge" in model["forge_stack"]
+
+
+def test_ready_open_source_attempt_requires_foss_check(tmp_path: Path, monkeypatch) -> None:
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='demo'\nlicense='MIT'\n")
+    monkeypatch.setattr(shipr.core, "_repository_visibility", lambda _root: "public")
+    write_release_model(tmp_path, detect_release_model(tmp_path))
+
+    _, attempt = record_attempt(tmp_path, goal="publish demo", status="ready")
+
+    assert attempt["next_actions"][0] == "run foss-forge /foss-check before public publish"
+
+
+def test_store_check_detects_marketplace_drift(tmp_path: Path) -> None:
+    project = tmp_path / "demo"
+    marketplace = tmp_path / "marketplace"
+    (project / ".claude-plugin").mkdir(parents=True)
+    (project / ".claude-plugin" / "marketplace.json").write_text('{"plugins":[{"name":"demo"}]}')
+    (project / "README.md").write_text("canonical\n")
+    (marketplace / ".claude-plugin").mkdir(parents=True)
+    (marketplace / ".claude-plugin" / "marketplace.json").write_text(
+        '{"plugins":[{"name":"demo","x-eidos":{"kind":{"type":"forge"}}}]}'
+    )
+
+    store_to_marketplace(project, marketplace, record=False)
+    assert check_marketplace_mirror(project, marketplace)["in_sync"] is True
+    stored = json.loads((marketplace / ".claude-plugin" / "marketplace.json").read_text())
+    assert stored["plugins"][0]["x-eidos"] == {"kind": {"type": "forge"}}
+
+    (marketplace / "plugins" / "demo" / "README.md").write_text("drifted\n")
+    result = check_marketplace_mirror(project, marketplace)
+    assert result["in_sync"] is False
+    assert result["drift"] == ["README.md"]
 
 
 def test_detects_python_plugin_project(tmp_path: Path) -> None:

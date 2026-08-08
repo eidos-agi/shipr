@@ -17,6 +17,7 @@ shipr frontier --project . --json
 
 The model should identify:
 
+- repository visibility, license, and open-source status
 - artifact types
 - distribution channels
 - proof commands
@@ -62,6 +63,14 @@ Shipr routes through:
 - `foss-forge` for public package quality
 - `learning-forge` for durable lessons
 - `loss-forge` for release quality measurement
+
+Before editing a marketplace copy, check it against the canonical plugin:
+
+```bash
+shipr store --project . --marketplace /path/to/eidos-marketplace --check --json
+```
+
+Use `shipr store` without `--check` to refresh the mirror only after reviewing its drift list.
 
 ## Approval Boundary
 

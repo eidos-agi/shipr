@@ -9,6 +9,7 @@ from pathlib import Path
 
 from . import __version__
 from .core import (
+    check_marketplace_mirror,
     detect_release_model,
     read_asmp_marketplace_path,
     record_attempt,
@@ -78,7 +79,12 @@ def _cmd_store(args: argparse.Namespace) -> None:
                 "shipr store needs --marketplace <store path>, or a "
                 "`ships:\\n  marketplace_path:` line in the project's asmp.yaml"
             )
-    _print(store_to_marketplace(args.project, marketplace), args.json)
+    result = (
+        check_marketplace_mirror(args.project, marketplace)
+        if args.check
+        else store_to_marketplace(args.project, marketplace)
+    )
+    _print(result, args.json)
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -130,6 +136,7 @@ def main(argv: list[str] | None = None) -> None:
         default=None,
         help="Path to the eidos-marketplace checkout. Omit to read ships.marketplace_path from asmp.yaml.",
     )
+    p_store.add_argument("--check", action="store_true", help="Report drift without writing")
     p_store.add_argument("--json", action="store_true", help="Output JSON")
 
     args = parser.parse_args(argv)

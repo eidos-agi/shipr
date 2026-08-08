@@ -1,6 +1,6 @@
 {
   "name": "shipr",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Persistent Eidos shipping operator that learns how each product ships.",
   "author": {
     "name": "Eidos AGI",

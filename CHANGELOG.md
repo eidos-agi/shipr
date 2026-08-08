@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 - 2026-08-07
 
+- Detect GitHub repository visibility and declared license metadata.
+- Route public, license-missing, and open-source candidate projects through
+  `foss-forge`.
+- Require `/foss-check` in ready-attempt next actions before public release.
 - Added deterministic blocker classification for common `eidos ship` gates,
   including category, owner, tool, severity, and suggested next action.
 - Release attempts now store `blocker_records` alongside legacy blocker IDs.

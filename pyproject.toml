@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "shipr"
-version = "0.2.0"
+version = "0.2.1"
 description = "Persistent Eidos shipping operator that learns how each product ships."
 readme = "README.md"
 license = "MIT"

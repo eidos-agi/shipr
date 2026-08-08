@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import re
 import shlex
 import shutil
+import subprocess
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -89,6 +92,51 @@ FALLBACK_BLOCKER_CLASSIFICATION = {
 
 def _exists(root: Path, *parts: str) -> bool:
     return (root.joinpath(*parts)).exists()
+
+
+def _declared_license(root: Path) -> str | None:
+    pyproject = root / "pyproject.toml"
+    if pyproject.exists():
+        try:
+            declared = tomllib.loads(pyproject.read_text()).get("project", {}).get("license")
+            if isinstance(declared, str) and declared.strip():
+                return declared.strip()
+            if isinstance(declared, dict):
+                value = declared.get("text") or declared.get("file")
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+        except (OSError, tomllib.TOMLDecodeError):
+            pass
+    if any((root / name).exists() for name in ("LICENSE", "LICENSE.txt", "LICENSE.md")):
+        return "declared"
+    return None
+
+
+def _repository_visibility(root: Path) -> str:
+    if not (root / ".git").exists() or not shutil.which("gh"):
+        return "unknown"
+    try:
+        remote = subprocess.run(
+            ["git", "-C", str(root), "remote", "get-url", "origin"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        ).stdout.strip()
+        match = re.search(r"github\.com[/:]([^/]+)/([^/]+?)(?:\.git)?$", remote)
+        if not match:
+            return "unknown"
+        result = subprocess.run(
+            ["gh", "repo", "view", f"{match.group(1)}/{match.group(2)}", "--json", "visibility"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        visibility = str(json.loads(result.stdout).get("visibility", "unknown")).lower()
+        return visibility if visibility in {"public", "private", "internal"} else "unknown"
+    except (OSError, subprocess.SubprocessError, json.JSONDecodeError):
+        return "unknown"
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -365,7 +413,21 @@ def detect_release_model(project: Path, description: str = "") -> dict[str, Any]
         "customer/outbound messaging",
     ]
     rollback: list[str] = []
-    companions = ["forge-forge", "ship-forge", "security-forge", "learning-forge", "loss-forge"]
+    license_name = _declared_license(root)
+    repository_visibility = _repository_visibility(root)
+    if repository_visibility == "public":
+        open_source_status = "ready" if license_name else "license-missing"
+    elif repository_visibility in {"private", "internal"}:
+        open_source_status = "private"
+    elif license_name:
+        open_source_status = "candidate"
+    else:
+        open_source_status = "unknown"
+
+    companions = ["forge-forge", "ship-forge", "security-forge"]
+    if open_source_status in {"ready", "license-missing", "candidate"}:
+        companions.append("foss-forge")
+    companions.extend(["learning-forge", "loss-forge"])
 
     if _exists(root, "pyproject.toml"):
         artifact_types.append("python-package")
@@ -438,6 +500,9 @@ def detect_release_model(project: Path, description: str = "") -> dict[str, Any]
         "product_id": product,
         "project_root": str(root),
         "description": description,
+        "repository_visibility": repository_visibility,
+        "license": license_name,
+        "open_source_status": open_source_status,
         "artifact_types": sorted(set(artifact_types)),
         "distribution_channels": sorted(set(channels)),
         "proof_commands": list(dict.fromkeys(proof_commands)),
@@ -492,6 +557,14 @@ def record_attempt(
     timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     blockers = blockers or []
     blocker_records = blocker_records or classify_blockers([str(blocker) for blocker in blockers])
+    resolved_next_actions = next_actions or next_actions_for_attempt(
+        status, blockers, blocker_records
+    )
+    if status == "ready" and "foss-forge" in model.get("forge_stack", []):
+        resolved_next_actions = [
+            "run foss-forge /foss-check before public publish",
+            *resolved_next_actions,
+        ]
     attempt = {
         "schema_version": 1,
         "product_id": model["product_id"],
@@ -503,13 +576,16 @@ def record_attempt(
         "blocker_records": blocker_records,
         "gate_summary": gate_summary or [],
         "source": source or None,
-        "next_actions": next_actions or next_actions_for_attempt(status, blockers, blocker_records),
+        "next_actions": resolved_next_actions,
         "release_model_snapshot": {
             "artifact_types": model["artifact_types"],
             "distribution_channels": model["distribution_channels"],
             "proof_commands": model["proof_commands"],
             "approval_gates": model["approval_gates"],
             "forge_stack": model["forge_stack"],
+            "repository_visibility": model.get("repository_visibility", "unknown"),
+            "license": model.get("license"),
+            "open_source_status": model.get("open_source_status", "unknown"),
         },
         "learning_prompts": model["learning_questions"],
         "created_at": dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -665,8 +741,43 @@ _COPY_IGNORE = shutil.ignore_patterns(
     "*.egg-info",
     ".DS_Store",
     ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
     "__pycache__",
 )
+
+
+def _copyable_files(root: Path) -> dict[str, bytes]:
+    files: dict[str, bytes] = {}
+    for current, directories, names in os.walk(root):
+        ignored = set(_COPY_IGNORE(current, [*directories, *names]))
+        directories[:] = [name for name in directories if name not in ignored]
+        current_path = Path(current)
+        for name in names:
+            if name not in ignored:
+                path = current_path / name
+                files[str(path.relative_to(root))] = path.read_bytes()
+    return files
+
+
+def check_marketplace_mirror(project: Path, marketplace: Path) -> dict[str, Any]:
+    """Report whether the marketplace copy exactly matches the canonical plugin."""
+    project = Path(project).resolve()
+    destination = Path(marketplace).resolve() / "plugins" / project.name
+    source_files = _copyable_files(project)
+    destination_files = _copyable_files(destination) if destination.exists() else {}
+    drift = sorted(
+        path
+        for path in source_files.keys() | destination_files.keys()
+        if source_files.get(path) != destination_files.get(path)
+    )
+    return {
+        "plugin": project.name,
+        "in_sync": not drift,
+        "drift": drift,
+        "files_at": str(destination),
+    }
 
 
 def read_asmp_marketplace_path(project: Path) -> str | None:
@@ -707,7 +818,11 @@ def store_to_marketplace(project: Path, marketplace: Path, record: bool = True) 
     plugin_json_path = project / ".claude-plugin" / "plugin.json"
     plugin_json = _read_json(plugin_json_path) if plugin_json_path.exists() else {}
 
+    existing_entry = next(
+        (item for item in store.get("plugins", []) if item.get("name") == name), {}
+    )
     entry = {
+        **existing_entry,
         "name": name,
         "description": entry_src.get("description") or plugin_json.get("description", ""),
         "source": f"./plugins/{name}",
@@ -716,7 +831,8 @@ def store_to_marketplace(project: Path, marketplace: Path, record: bool = True) 
         "license": plugin_json.get("license", "MIT"),
         "version": entry_src.get("version") or plugin_json.get("version", "0.1.0"),
         "tags": plugin_json.get("keywords") or entry_src.get("tags") or [],
-        "x-eidos": {
+        "x-eidos": existing_entry.get("x-eidos")
+        or {
             "audit": {
                 "audited_by": "pending Forge-Forge release packet",
                 "grade": "PENDING",

@@ -1,5 +1,8 @@
 # Shipr
 
+[![CI](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml/badge.svg)](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Shipr is the persistent Eidos shipping operator. It learns how each product
 ships, records release attempts, and keeps the release frontier concrete.
 
@@ -60,6 +63,12 @@ Show the release frontier:
 shipr frontier --project /path/to/project --json
 ```
 
+Check that a marketplace copy still matches its canonical plugin without writing:
+
+```bash
+shipr store --project . --marketplace /path/to/eidos-marketplace --check --json
+```
+
 ## Ship Shipr
 
 Shipr records its own release model and proof before the normal Git push:
@@ -89,6 +98,10 @@ Shipr composes the existing Eidos shipping stack:
 - `learning-forge` turns release outcomes into reusable lessons.
 - `loss-forge` adds release quality measurements.
 
+Shipr detects GitHub visibility and declared license metadata. Public projects,
+public projects missing a license, and license-declared candidates are routed
+through `foss-forge` in the generated product release model.
+
 The durable state lives under `.shipr/` in each product:
 
 ```text
@@ -100,6 +113,10 @@ The durable state lives under `.shipr/` in each product:
 When Shipr writes that state inside a Git project, it also ensures `.shipr/`
 is present in the project's `.gitignore` so release memory does not appear as
 untracked product code.
+
+## License
+
+Shipr is released under the [MIT License](LICENSE).
 
 ## Problem Handling
 
