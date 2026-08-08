@@ -13,7 +13,6 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-
 MODEL_PATH = Path(".shipr/product-release-model.json")
 ATTEMPTS_DIR = Path(".shipr/release-attempts")
 SHIPR_IGNORE_ENTRY = ".shipr/"
