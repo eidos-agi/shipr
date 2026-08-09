@@ -43,15 +43,15 @@ shipr (product)
 
 - [x] This merge plan in shipr.
 - [x] ship-forge README → points here; no new ship-forge features.
-- [ ] forge-forge registry: ship-forge entry notes “methods live in shipr”.
+- [x] forge-forge registry: ship-forge retired + shipr active; test-forge retired + testr active.
 
 ### Phase 1 — Method absorb (content)
 
-- [ ] Copy ship-forge skills into `shipr/docs/methods/` (or `shipr/skills/methods/`):
+- [x] Copy ship-forge skills into `shipr/docs/methods/`:
   - ship-check, ship-init, ship-release, ship-deploy, ship-qa, ship-detect, ship-dev, ship-full-audit
-- [ ] Copy `templates/*` into `shipr/templates/`.
-- [ ] Copy key findings (PyPI lifecycle, release checklist) into `shipr/docs/findings/` with provenance links.
-- [ ] Update `use-shipr` skill: run **check discipline before attempt shipped**.
+- [x] Copy `templates/*` into `shipr/templates/`.
+- [x] Copy key findings into `shipr/docs/findings/` with provenance links.
+- [x] Update `use-shipr` skill: run **check discipline before attempt shipped**.
 
 ### Phase 2 — CLI that runs the best of ship-check
 
@@ -67,8 +67,9 @@ shipr (product)
 
 ### Phase 4 — Deprecate ship-forge
 
-- [ ] ship-forge: RETIRED.md or README-only pointer (like test-forge pattern).
-- [ ] marketplace/Codex skills: point to shipr.
+- [x] ship-forge: RETIRED.md + README pointer (like test-forge pattern).
+- [x] forge-forge registry points ship-forge → shipr; test-forge → testr.
+- [ ] marketplace/Codex plugin mirrors: keep aligned with shipr skill when republishing.
 - [ ] eidos-ship-labs (if present): research lives there; tool is shipr.
 
 ## Success criteria

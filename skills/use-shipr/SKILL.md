@@ -56,3 +56,15 @@ payments, and outbound announcements unless the user explicitly approves.
 ## Tracked config
 
 `.shipr/` and `.testr/` are committed product config. Tools strip ignore rules and create missing sibling models on write.
+
+## Methods (absorbed from ship-forge)
+
+Read playbooks under `docs/methods/` (ship-check, ship-init, ship-release, …)
+and templates under `templates/`. Before `shipr attempt --status shipped`, apply
+**ship-check discipline**: clean tree, proofs from the model actually run by you,
+human gates for public tag/publish/deploy.
+
+## Registry
+
+forge-forge lists **shipr** as the active shipping operator; **ship-forge** is
+`status: retired` with `successor: shipr`.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 - 2026-08-09
+
+- Nanosecond attempt IDs for chronological frontiers under stress.
+- forge system: Phase 1 method absorb (`docs/methods/`, `templates/`, `docs/findings/`).
+- forge-forge registry registers shipr/testr; ship-forge/test-forge retired pointers.
+
 ## 0.3.1 - 2026-08-08
 
 - **Track configs:** `.shipr/` and `.testr/` are product config, not gitignored.
