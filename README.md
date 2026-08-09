@@ -1,150 +1,96 @@
 # Shipr
 
-> **Canonical home for shipping.** Methods formerly in [ship-forge](https://github.com/eidos-agi/ship-forge) are merging here.  
-> Merge plan: [`docs/SHIP-FORGE-MERGE.md`](docs/SHIP-FORGE-MERGE.md).  
-> Sibling for test memory: [testr](https://github.com/eidos-agi/testr).
-
+> **AI shipping config + release memory** — not a deploy runner.  
+> Methods from [ship-forge](https://github.com/eidos-agi/ship-forge) merge here: [`docs/SHIP-FORGE-MERGE.md`](docs/SHIP-FORGE-MERGE.md).  
+> Sibling test config: [testr](https://github.com/eidos-agi/testr).
 
 [![CI](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml/badge.svg)](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Shipr is the persistent Eidos shipping operator. It learns how each product
-ships, records release attempts, and keeps the release frontier concrete.
+## What this is
 
-Shipr is the **shipping operator and (in progress) method home**. Historical release playbooks lived in `ship-forge`; they are merging into this repo (see merge plan). Shipr still composes security-forge / foss-forge / learning-forge / loss-forge.
+**Shipr tells AI agents how a product ships**, and stores that config so the next
+session (or agent) can do it the same way.
 
-## What Shipr Owns
+It is **not** an app that ships, deploys, tags, or runs proof commands. The
+agent reads `.shipr/product-release-model.json`, runs the proofs itself, then
+records what happened with `shipr attempt`.
 
-- Product release models
-- Release attempt ledgers
-- Eidos shipment gate summaries and blockers
-- Proof command history
-- Distribution channels
-- Human approval gates
-- Rollback paths
-- Per-product lessons for the next release
+| Layer | Role |
+|-------|------|
+| **Config** | `.shipr/product-release-model.json` — channels, proofs, gates, rollback |
+| **Ledger** | `.shipr/release-attempts/` — what was tried and what broke |
+| **Frontier** | `shipr frontier` — what to do next (for the AI) |
+| **Sibling** | [testr](https://github.com/eidos-agi/testr) — how the product is *proven* |
 
-## Install
+When `.testr/product-test-model.json` exists, Shipr **absorbs `test_commands`
+into `proof_commands`** so ship and test gates stay one story.
+
+## Install (Go — canonical)
 
 ```bash
-git clone https://github.com/eidos-agi/shipr.git
-cd shipr
-pip install -e .
-shipr --version
+go install github.com/eidos-agi/shipr/cmd/shipr@latest
+# or from a clone:
+git clone https://github.com/eidos-agi/shipr.git && cd shipr
+go install ./cmd/shipr
+shipr version
 ```
 
-## Use
+Legacy Python (`pip install -e .`) remains under `src/shipr/` for a transition
+period. Prefer the Go binary.
 
-Detect and write a product release model:
-
-```bash
-shipr model --project /path/to/project --write --json
-```
-
-Record a release attempt:
+## Use (agent workflow)
 
 ```bash
-shipr attempt --project /path/to/project \
+# 1. Materialize ship config (AI will read this)
+shipr model --project /path/to/product --write --json
+
+# 2. AI runs the listed proof_commands itself (pytest, go test, curl, …)
+
+# 3. Record outcome (ledger only — no execute)
+shipr attempt --project /path/to/product \
   --goal "publish marketplace plugin" \
-  --status planned \
-  --proof "python -m pytest -q" \
-  --json
-```
-
-Ingest an `eidos ship --json` report and preserve the gate structure:
-
-```bash
-eidos ship /path/to/project --json > /tmp/eidos-ship.json
-shipr attempt --project /path/to/project \
-  --eidos-ship-report /tmp/eidos-ship.json \
-  --json
-```
-
-Show the release frontier:
-
-```bash
-shipr frontier --project /path/to/project --json
-```
-
-Check that a marketplace copy still matches its canonical plugin without writing:
-
-```bash
-shipr store --project . --marketplace /path/to/eidos-marketplace --check --json
-```
-
-## Ship Shipr
-
-Shipr records its own release model and proof before the normal Git push:
-
-```bash
-shipr model --project . --write --json
-python -m pytest -q
-shipr attempt --project . \
-  --goal "ship Shipr" \
   --status ready \
-  --proof "python -m pytest -q" \
+  --proof "go test ./..." \
   --json
-git push origin main
+
+# 4. What's next for this product?
+shipr frontier --project /path/to/product --json
 ```
 
-Release memory stays local under `.shipr/`; the repository is
-[`eidos-agi/shipr`](https://github.com/eidos-agi/shipr).
+Compose with testr on the same product:
 
-## Design
+```bash
+testr model --project . --write --json   # test config first
+shipr model --project . --write --json   # proofs pull from testr
+```
 
-Shipr composes the existing Eidos shipping stack:
-
-- `forge-forge` routes the product to the right forges.
-- `ship-forge` supplies release hygiene and proof gates.
-- `security-forge` handles secrets and safety boundaries.
-- `foss-forge` handles public package quality.
-- `learning-forge` turns release outcomes into reusable lessons.
-- `loss-forge` adds release quality measurements.
-
-Shipr detects GitHub visibility and declared license metadata. Public projects,
-public projects missing a license, and license-declared candidates are routed
-through `foss-forge` in the generated product release model.
-
-The durable state lives under `.shipr/` in each product:
+## Durable state
 
 ```text
 .shipr/
-  product-release-model.json
-  release-attempts/
+  product-release-model.json   # how this product ships (AI how-to)
+  release-attempts/            # ledger of release tries
 ```
 
-When Shipr writes that state inside a Git project, it also ensures `.shipr/`
-is present in the project's `.gitignore` so release memory does not appear as
-untracked product code.
+`.shipr/` is gitignored by default when Shipr writes it — local operator memory,
+not product source.
+
+## Design
+
+- **Role:** `ai_config_and_memory` — config + ledger, not executor.
+- **Companions:** security-forge, foss-forge, learning-forge, loss-forge, **testr**.
+- **Visibility / license** detection still feeds `open_source_status` and
+  foss-forge routing in the model.
+- **Approval boundary:** stop before public tags, package publishes, production
+  deploys, credentials, payments, outbound announcements unless the human
+  explicitly approves. Shipr only stores that those gates exist.
+
+## Docs
+
+- Product model shape: [`docs/shipr-product-model.md`](docs/shipr-product-model.md)
+- ship-forge → shipr: [`docs/SHIP-FORGE-MERGE.md`](docs/SHIP-FORGE-MERGE.md)
 
 ## License
 
-Shipr is released under the [MIT License](LICENSE).
-
-## Problem Handling
-
-When Shipr ingests `eidos ship --json`, it keeps the compact failed gate IDs in
-`blockers` and also writes `blocker_records` with:
-
-- `category`
-- `owner`
-- `tool`
-- `severity`
-- `suggested_next_action`
-
-Known gates such as `git-clean-pushed`, `agentic-first-doctrine`, `node-build`,
-`python-tests`, `stepproof-audit`, `codex-plugin-validator`, and
-`felix-plugin-doctor` get deterministic routing. Custom gates fall back to a
-conservative `custom-gate` classification, with light inference for build,
-test, validation, security, and proof/audit names.
-
-`shipr frontier --json` surfaces the latest blocker records and recurring
-blockers seen across attempts, so repeated failures can be promoted to durable
-gate repairs without making Shipr absorb the specialist tool behavior itself.
-
-## Boundary
-
-Shipr may inspect projects, write local release memory, and propose release
-frontiers. It must stop before public tags, package publishes, production
-deploys, credential changes, payments, and outbound announcements unless the
-user explicitly approves the action.
+MIT — Eidos AGI

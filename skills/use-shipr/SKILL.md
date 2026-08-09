@@ -1,85 +1,54 @@
 ---
 name: use-shipr
-description: Use when the user wants to ship, release, publish, deploy, package, list in a marketplace, or learn how a product ships over time.
+description: Use when the user wants to ship, release, publish, deploy, package, list in a marketplace, or learn how a product ships over time. Shipr stores AI config + release memory — it does not run deploy/ship itself.
 ---
 
 # Use Shipr
 
-Shipr is the persistent Eidos shipping operator. It learns each product's
-release shape and keeps release memory under `.shipr/`.
+Shipr is **AI shipping config + release memory**. It does **not** ship, deploy, or
+run proofs. You read the model, run proofs yourself, then record the attempt.
 
-## Start With The Product Model
+## Start with the product model
 
 ```bash
 shipr model --project . --write --json
 shipr frontier --project . --json
 ```
 
-The model should identify:
+The model tells you:
 
-- repository visibility, license, and open-source status
-- artifact types
-- distribution channels
-- proof commands
-- human approval gates
-- rollback paths
-- forge stack
-- learning questions for the next release
+- repository visibility, license, open-source status
+- artifact types and distribution channels
+- **proof_commands** (run these yourself)
+- human approval gates and rollback paths
+- forge companions + learning questions
+- **related_testr** — when `.testr/` exists, proofs come from testr
 
-## Record Every Attempt
+## Prefer testr first
 
 ```bash
+testr model --project . --write --json
+shipr model --project . --write --json   # proof_source: testr
+```
+
+## Record every attempt (ledger only)
+
+```bash
+# After YOU run the proofs:
 shipr attempt --project . \
   --goal "ship the next release" \
-  --status planned \
-  --proof "pytest -q" \
+  --status planned|ready|blocked|shipped|rolled_back \
+  --proof "go test ./..." \
   --json
 ```
 
-Every release attempt should leave proof, blockers, and one lesson that should
-be automatic next time.
-
-## Ingest Eidos Ship Reports
-
-When `eidos ship --json` is available, preserve the structured gate results
-instead of flattening them into prose:
+## Install
 
 ```bash
-eidos ship . --json > /tmp/eidos-ship.json
-shipr attempt --project . --eidos-ship-report /tmp/eidos-ship.json --json
-shipr frontier --project . --json
+go install github.com/eidos-agi/shipr/cmd/shipr@latest
 ```
 
-Shipr will infer `ready` vs `blocked`, store blocked gate IDs, retain a compact
-gate summary, and surface next actions in the frontier.
+## Approval boundary
 
-## Methods + memory
-
-- Per-repo ship file: `.shipr/product-release-model.json` (local; gitignored by default)
-- Merge plan (ship-forge → shipr): `docs/SHIP-FORGE-MERGE.md`
-- Prefer **testr** product test model when `.testr/` exists; ship proofs should match testr gates
-
-## Compose
-
-Shipr routes through:
-
-- `forge-forge` for which forges apply
-- **shipr methods** (formerly ship-forge) for release hygiene
-- `security-forge` for safety and secret scans
-- `foss-forge` for public package quality
-- `learning-forge` for durable lessons
-- `loss-forge` for release quality measurement
-
-Before editing a marketplace copy, check it against the canonical plugin:
-
-```bash
-shipr store --project . --marketplace /path/to/eidos-marketplace --check --json
-```
-
-Use `shipr store` without `--check` to refresh the mirror only after reviewing its drift list.
-
-## Approval Boundary
-
-Shipr may inspect projects and write local release memory. Stop before public
-tags, package publishes, production deploys, credential changes, payments,
-filings, and outbound announcements unless the user explicitly approves.
+Stop before public tags, package publishes, production deploys, credentials,
+payments, and outbound announcements unless the user explicitly approves.

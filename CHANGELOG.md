@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 - 2026-08-08
+
+- **Go is canonical** (`cmd/shipr`, `go install`). Python CLI demoted to legacy.
+- Product identity: **AI shipping config + release memory** — does not ship or
+  run proofs; agents execute `proof_commands` and record outcomes.
+- Cross-wire with **testr**: when `.testr/product-test-model.json` exists,
+  `test_commands` become preferred `proof_commands` (`proof_source: testr`).
+- Model/frontier include `role: ai_config_and_memory` and `related_testr`.
+- README, AGENTS.md, skill reoriented to config-for-AI language.
+
 ## 0.2.1 - 2026-08-07
 
 - Detect GitHub repository visibility and declared license metadata.

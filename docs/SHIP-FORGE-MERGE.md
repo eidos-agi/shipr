@@ -11,7 +11,11 @@ One mental product for “how does this repo ship?”
 | Was | Becomes |
 |-----|---------|
 | ship-forge (playbooks/skills/templates) | **Methods inside shipr** (`docs/methods/`, skills under shipr) |
-| shipr (CLI + `.shipr/` memory) | **Operator of record** — unchanged core job, richer methods |
+| shipr (CLI + `.shipr/` memory) | **AI shipping config + release memory** — not a deploy runner |
+
+Shipr tells AI agents how a product ships and records attempts. Agents run
+proofs and deploys themselves. Sibling **testr** holds test config; shipr
+absorbs its `test_commands` as `proof_commands`.
 
 ship-forge does **not** stay a parallel brand. It becomes a **pointer** to shipr.
 
@@ -26,11 +30,11 @@ ship-forge does **not** stay a parallel brand. It becomes a **pointer** to shipr
 
 ```text
 shipr (product)
-├── CLI operator          model / attempt / frontier / store
+├── Go CLI (canonical)    model / attempt / frontier / store  — config only
 ├── .shipr/               per-repo product-release-model + attempts (gitignored)
 ├── docs/methods/         ← absorbed ship-forge skills content
 ├── templates/            ← absorbed ship-forge CI/gitignore/pre-commit templates
-└── skills/use-shipr      agent entry: model + check + release + record
+└── skills/use-shipr      agent entry: read model → AI runs proofs → record
 ```
 
 ## Phases

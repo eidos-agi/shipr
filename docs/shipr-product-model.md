@@ -1,15 +1,20 @@
 # Shipr Product Release Model
 
-Shipr treats every product as having its own release fingerprint.
+Shipr treats every product as having its own **ship how-to** for AI agents.
+
+**Role:** `ai_config_and_memory` — config + ledger. Shipr does not ship or run proofs.
 
 ```text
 ProductReleaseModel
+- role / purpose
 - repository_visibility
 - license
 - open_source_status
 - artifact_types
 - distribution_channels
-- proof_commands
+- proof_commands          # AI runs these
+- proof_source            # "testr" | "detected"
+- related_testr           # path + loaded flag
 - approval_gates
 - rollback_paths
 - forge_stack
@@ -19,19 +24,19 @@ ProductReleaseModel
 `open_source_status` is `ready` when a public repository declares a license,
 `license-missing` when a public repository needs repair, and `candidate` when
 license metadata signals open-source intent before remote visibility is known.
-All three route through `foss-forge`; private and unknown projects do not.
+All three route through `foss-forge` in the model; private and unknown do not.
 
-The model is stored at `.shipr/product-release-model.json` in the product repo.
-Release attempts are stored as JSON files under `.shipr/release-attempts/`.
-Attempts may include structured `eidos ship` evidence:
+## Sibling: testr
+
+If `.testr/product-test-model.json` exists, its `test_commands` are preferred as
+`proof_commands` (`proof_source: testr`). Write testr first, then shipr model.
+
+## Storage
 
 ```text
-ReleaseAttempt
-- blockers
-- gate_summary
-- source
-- next_actions
+.shipr/product-release-model.json
+.shipr/release-attempts/
 ```
 
-This keeps release knowledge next to the product so each ship can improve the
-next one.
+Release attempts may include structured evidence (proofs, blockers, next_actions).
+Knowledge stays next to the product so each ship improves the next one — for the AI.
