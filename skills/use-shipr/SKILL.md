@@ -53,12 +53,18 @@ shipr frontier --project . --json
 Shipr will infer `ready` vs `blocked`, store blocked gate IDs, retain a compact
 gate summary, and surface next actions in the frontier.
 
-## Compose, Do Not Replace
+## Methods + memory
+
+- Per-repo ship file: `.shipr/product-release-model.json` (local; gitignored by default)
+- Merge plan (ship-forge → shipr): `docs/SHIP-FORGE-MERGE.md`
+- Prefer **testr** product test model when `.testr/` exists; ship proofs should match testr gates
+
+## Compose
 
 Shipr routes through:
 
 - `forge-forge` for which forges apply
-- `ship-forge` for release hygiene
+- **shipr methods** (formerly ship-forge) for release hygiene
 - `security-forge` for safety and secret scans
 - `foss-forge` for public package quality
 - `learning-forge` for durable lessons

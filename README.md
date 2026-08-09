@@ -1,14 +1,17 @@
 # Shipr
 
+> **Canonical home for shipping.** Methods formerly in [ship-forge](https://github.com/eidos-agi/ship-forge) are merging here.  
+> Merge plan: [`docs/SHIP-FORGE-MERGE.md`](docs/SHIP-FORGE-MERGE.md).  
+> Sibling for test memory: [testr](https://github.com/eidos-agi/testr).
+
+
 [![CI](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml/badge.svg)](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Shipr is the persistent Eidos shipping operator. It learns how each product
 ships, records release attempts, and keeps the release frontier concrete.
 
-Shipr is not a replacement for `ship-forge`. `ship-forge` is the release method
-library. Shipr is the operator that applies the right forge stack to each
-product and remembers what happened.
+Shipr is the **shipping operator and (in progress) method home**. Historical release playbooks lived in `ship-forge`; they are merging into this repo (see merge plan). Shipr still composes security-forge / foss-forge / learning-forge / loss-forge.
 
 ## What Shipr Owns
 
