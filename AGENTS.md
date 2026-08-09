@@ -1,5 +1,9 @@
 # Shipr — agent notes
 
+## OPF
+
+Canonical product graph: `docs/opf/product.json`. Validate: `python3 -m opf.validate docs/opf`.
+
 ## Product identity
 
 Shipr is **AI shipping config + release memory**. It does **not** ship, deploy,

@@ -88,6 +88,7 @@ not product source.
 
 ## Docs
 
+- **OPF product graph:** [`docs/opf/`](docs/opf/) (`product.json` — validate with `python3 -m opf.validate docs/opf`)
 - Product model shape: [`docs/shipr-product-model.md`](docs/shipr-product-model.md)
 - ship-forge → shipr: [`docs/SHIP-FORGE-MERGE.md`](docs/SHIP-FORGE-MERGE.md)
 

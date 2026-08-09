@@ -1,0 +1,1331 @@
+{
+  "format": "opf",
+  "version": "1.0",
+  "product": "opf:shipr:product",
+  "entities": [
+    {
+      "id": "opf:shipr:product",
+      "type": "product",
+      "title": "Shipr",
+      "status": "operating",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "AI shipping config and release memory. Stores how a product ships under .shipr/; does not ship, deploy, or run proofs. Agents read the model, run proof_commands, and record attempts."
+    },
+    {
+      "id": "opf:shipr:area:intent",
+      "type": "area",
+      "title": "Intent",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      }
+    },
+    {
+      "id": "opf:shipr:area:experience",
+      "type": "area",
+      "title": "Experience",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      }
+    },
+    {
+      "id": "opf:shipr:area:governance",
+      "type": "area",
+      "title": "Decisions and authority",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      }
+    },
+    {
+      "id": "opf:shipr:area:delivery",
+      "type": "area",
+      "title": "Promises and work",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      }
+    },
+    {
+      "id": "opf:shipr:area:assurance",
+      "type": "area",
+      "title": "Evidence and proof",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      }
+    },
+    {
+      "id": "opf:shipr:area:gaps",
+      "type": "area",
+      "title": "Unresolved gaps",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      }
+    },
+    {
+      "id": "opf:shipr:intent:repeatable-ship-config",
+      "type": "intent",
+      "title": "Make how-each-product-ships durable for AI agents",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Every product gets a committed release fingerprint so the next agent does not reinvent channels, proofs, gates, and rollback.",
+      "content": "index.md"
+    },
+    {
+      "id": "opf:shipr:user:coding-agent",
+      "type": "user",
+      "title": "Coding agent",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Reads .shipr/product-release-model.json, runs proof_commands, records shipr attempt."
+    },
+    {
+      "id": "opf:shipr:user:human-releaser",
+      "type": "user",
+      "title": "Human releaser",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Approves irreversible steps (tags, publishes, production deploys)."
+    },
+    {
+      "id": "opf:shipr:problem:ephemeral-release-knowledge",
+      "type": "problem",
+      "title": "Release knowledge dies between sessions",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Agents re-discover how to ship; proofs and gates are chat-local; ship-forge playbooks and product memory forked."
+    },
+    {
+      "id": "opf:shipr:promise:durable-ship-config",
+      "type": "promise",
+      "title": "Per-product ship config + attempt ledger under .shipr/",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "product-release-model.json holds channels, proof_commands, approval_gates, rollback; attempts ledger records outcomes. Shipr does not execute ship/deploy."
+    },
+    {
+      "id": "opf:shipr:outcome:repeatable-release",
+      "type": "outcome",
+      "title": "Any agent can ship the same product the same way",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Read model \u2192 run proofs \u2192 record attempt \u2192 frontier shows next actions."
+    },
+    {
+      "id": "opf:shipr:journey:ship-with-config",
+      "type": "journey",
+      "title": "Ship using durable config",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Materialize model, prefer testr proofs, agent runs proofs, record attempt, consult frontier."
+    },
+    {
+      "id": "opf:shipr:moment:write-model",
+      "type": "moment",
+      "title": "Write or refresh release model",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "shipr model --write materializes .shipr/product-release-model.json; absorbs testr test_commands when present."
+    },
+    {
+      "id": "opf:shipr:moment:run-proofs",
+      "type": "moment",
+      "title": "Agent runs proof_commands",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Shipr does not execute; agent runs go test / pytest / deploy checks listed in the model."
+    },
+    {
+      "id": "opf:shipr:moment:record-attempt",
+      "type": "moment",
+      "title": "Record release attempt",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "shipr attempt stores status, proofs, blockers under .shipr/release-attempts/."
+    },
+    {
+      "id": "opf:shipr:moment:read-frontier",
+      "type": "moment",
+      "title": "Read release frontier",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "shipr frontier returns next_actions for the agent."
+    },
+    {
+      "id": "opf:shipr:surface:cli",
+      "type": "surface",
+      "title": "shipr CLI (Go)",
+      "status": "operating",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "model | attempt | frontier | store \u2014 config and ledger only."
+    },
+    {
+      "id": "opf:shipr:surface:release-model-file",
+      "type": "surface",
+      "title": ".shipr/product-release-model.json",
+      "status": "operating",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Committed product release fingerprint agents read."
+    },
+    {
+      "id": "opf:shipr:state:model-ready",
+      "type": "state",
+      "title": "Model ready",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "product-release-model.json present; frontier status model_ready."
+    },
+    {
+      "id": "opf:shipr:state:attempt-blocked",
+      "type": "state",
+      "title": "Attempt blocked",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Latest attempt status blocked; next_actions clear blockers."
+    },
+    {
+      "id": "opf:shipr:interaction:run-model",
+      "type": "interaction",
+      "title": "shipr model --write",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Detect and write release config."
+    },
+    {
+      "id": "opf:shipr:interaction:run-attempt",
+      "type": "interaction",
+      "title": "shipr attempt",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Append attempt ledger entry without executing proofs."
+    },
+    {
+      "id": "opf:shipr:authority:maintainers",
+      "type": "authority",
+      "title": "Shipr maintainers (Eidos AGI)",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Own CLI, schema, and product identity."
+    },
+    {
+      "id": "opf:shipr:decision:config-not-runner",
+      "type": "decision",
+      "title": "Shipr is AI config and memory, not a ship runner",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Agents execute proofs and deploys; shipr only stores how-to and ledgers."
+    },
+    {
+      "id": "opf:shipr:decision:go-canonical",
+      "type": "decision",
+      "title": "Go CLI is canonical",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "cmd/shipr is the supported binary; Python src/shipr is legacy transition."
+    },
+    {
+      "id": "opf:shipr:decision:absorb-testr",
+      "type": "decision",
+      "title": "Prefer testr test_commands as proof_commands",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "When .testr/product-test-model.json exists, proof_source is testr."
+    },
+    {
+      "id": "opf:shipr:decision:ship-forge-merge",
+      "type": "decision",
+      "title": "Absorb ship-forge methods into shipr",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "ship-forge becomes a pointer; methods live under shipr docs/skills."
+    },
+    {
+      "id": "opf:shipr:work:go-port",
+      "type": "work",
+      "title": "Go port of shipr CLI",
+      "status": "complete",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "cmd/shipr + internal/shipr model, attempt, frontier shipped 0.3.0."
+    },
+    {
+      "id": "opf:shipr:work:ship-forge-absorb",
+      "type": "work",
+      "title": "Absorb ship-forge methods",
+      "status": "building",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Phase 1 method copy into docs/methods/ still open."
+    },
+    {
+      "id": "opf:shipr:evidence:github-main",
+      "type": "evidence",
+      "title": "eidos-agi/shipr main",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Public Go CLI, README identity, tests under internal/shipr."
+    },
+    {
+      "id": "opf:shipr:proof:go-test",
+      "type": "proof",
+      "title": "go test ./... passes",
+      "status": "validated",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "internal/shipr model_test covers testr absorb and write/load/attempt."
+    },
+    {
+      "id": "opf:shipr:proof:testr-absorb",
+      "type": "proof",
+      "title": "proof_source testr when .testr exists",
+      "status": "validated",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "DetectReleaseModel loads .testr/product-test-model.json test_commands first."
+    },
+    {
+      "id": "opf:shipr:gap:store-stub",
+      "type": "gap",
+      "title": "Go store marketplace write incomplete",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "shipr store --check is stub; full marketplace mirror not ported."
+    },
+    {
+      "id": "opf:shipr:gap:methods-absorb",
+      "type": "gap",
+      "title": "ship-forge method files not fully absorbed",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Merge plan phase 1 content copy open."
+    },
+    {
+      "id": "opf:shipr:gap:config-tracked",
+      "type": "gap",
+      "title": "Need committed .shipr/.testr config policy",
+      "status": "active",
+      "provenance": {
+        "by": "agent:grok",
+        "method": "OPF v1 pack for shipr/testr after Go config-memory reorientation 2026-08-08"
+      },
+      "description": "Product direction: .shipr and .testr should be created with config and NOT gitignored; ensureIgnored still demotes them in older paths."
+    }
+  ],
+  "relationships": [
+    {
+      "id": "opf:shipr:rel:contains:0",
+      "type": "contains",
+      "from": "opf:shipr:product",
+      "to": "opf:shipr:area:intent",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:1",
+      "type": "contains",
+      "from": "opf:shipr:product",
+      "to": "opf:shipr:area:experience",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:contains:2",
+      "type": "contains",
+      "from": "opf:shipr:product",
+      "to": "opf:shipr:area:governance",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:contains:3",
+      "type": "contains",
+      "from": "opf:shipr:product",
+      "to": "opf:shipr:area:delivery",
+      "order": 3
+    },
+    {
+      "id": "opf:shipr:rel:contains:4",
+      "type": "contains",
+      "from": "opf:shipr:product",
+      "to": "opf:shipr:area:assurance",
+      "order": 4
+    },
+    {
+      "id": "opf:shipr:rel:contains:5",
+      "type": "contains",
+      "from": "opf:shipr:product",
+      "to": "opf:shipr:area:gaps",
+      "order": 5
+    },
+    {
+      "id": "opf:shipr:rel:contains:6",
+      "type": "contains",
+      "from": "opf:shipr:area:intent",
+      "to": "opf:shipr:intent:repeatable-ship-config",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:expresses:7",
+      "type": "expresses",
+      "from": "opf:shipr:product",
+      "to": "opf:shipr:intent:repeatable-ship-config"
+    },
+    {
+      "id": "opf:shipr:rel:contains:8",
+      "type": "contains",
+      "from": "opf:shipr:area:intent",
+      "to": "opf:shipr:user:coding-agent",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:contains:9",
+      "type": "contains",
+      "from": "opf:shipr:area:intent",
+      "to": "opf:shipr:user:human-releaser",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:contains:10",
+      "type": "contains",
+      "from": "opf:shipr:area:intent",
+      "to": "opf:shipr:problem:ephemeral-release-knowledge",
+      "order": 3
+    },
+    {
+      "id": "opf:shipr:rel:contains:11",
+      "type": "contains",
+      "from": "opf:shipr:area:intent",
+      "to": "opf:shipr:promise:durable-ship-config",
+      "order": 4
+    },
+    {
+      "id": "opf:shipr:rel:contains:12",
+      "type": "contains",
+      "from": "opf:shipr:area:intent",
+      "to": "opf:shipr:outcome:repeatable-release",
+      "order": 5
+    },
+    {
+      "id": "opf:shipr:rel:for-user:13",
+      "type": "for-user",
+      "from": "opf:shipr:problem:ephemeral-release-knowledge",
+      "to": "opf:shipr:user:coding-agent"
+    },
+    {
+      "id": "opf:shipr:rel:for-user:14",
+      "type": "for-user",
+      "from": "opf:shipr:promise:durable-ship-config",
+      "to": "opf:shipr:user:coding-agent"
+    },
+    {
+      "id": "opf:shipr:rel:for-user:15",
+      "type": "for-user",
+      "from": "opf:shipr:promise:durable-ship-config",
+      "to": "opf:shipr:user:human-releaser"
+    },
+    {
+      "id": "opf:shipr:rel:for-user:16",
+      "type": "for-user",
+      "from": "opf:shipr:outcome:repeatable-release",
+      "to": "opf:shipr:user:coding-agent"
+    },
+    {
+      "id": "opf:shipr:rel:addresses:17",
+      "type": "addresses",
+      "from": "opf:shipr:promise:durable-ship-config",
+      "to": "opf:shipr:problem:ephemeral-release-knowledge"
+    },
+    {
+      "id": "opf:shipr:rel:serves:18",
+      "type": "serves",
+      "from": "opf:shipr:promise:durable-ship-config",
+      "to": "opf:shipr:outcome:repeatable-release"
+    },
+    {
+      "id": "opf:shipr:rel:contains:19",
+      "type": "contains",
+      "from": "opf:shipr:area:experience",
+      "to": "opf:shipr:journey:ship-with-config",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:for-user:20",
+      "type": "for-user",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:user:coding-agent"
+    },
+    {
+      "id": "opf:shipr:rel:serves:21",
+      "type": "serves",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:outcome:repeatable-release"
+    },
+    {
+      "id": "opf:shipr:rel:contains:22",
+      "type": "contains",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:write-model",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:has-step:23",
+      "type": "has-step",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:write-model",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:24",
+      "type": "contains",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:run-proofs",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:has-step:25",
+      "type": "has-step",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:run-proofs",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:contains:26",
+      "type": "contains",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:record-attempt",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:has-step:27",
+      "type": "has-step",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:record-attempt",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:contains:28",
+      "type": "contains",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:read-frontier",
+      "order": 3
+    },
+    {
+      "id": "opf:shipr:rel:has-step:29",
+      "type": "has-step",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:moment:read-frontier",
+      "order": 3
+    },
+    {
+      "id": "opf:shipr:rel:contains:30",
+      "type": "contains",
+      "from": "opf:shipr:area:experience",
+      "to": "opf:shipr:surface:cli",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:contains:31",
+      "type": "contains",
+      "from": "opf:shipr:area:experience",
+      "to": "opf:shipr:surface:release-model-file",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:contains:32",
+      "type": "contains",
+      "from": "opf:shipr:surface:cli",
+      "to": "opf:shipr:state:model-ready",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:33",
+      "type": "contains",
+      "from": "opf:shipr:surface:cli",
+      "to": "opf:shipr:state:attempt-blocked",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:has-state:34",
+      "type": "has-state",
+      "from": "opf:shipr:surface:cli",
+      "to": "opf:shipr:state:model-ready"
+    },
+    {
+      "id": "opf:shipr:rel:has-state:35",
+      "type": "has-state",
+      "from": "opf:shipr:surface:cli",
+      "to": "opf:shipr:state:attempt-blocked"
+    },
+    {
+      "id": "opf:shipr:rel:contains:36",
+      "type": "contains",
+      "from": "opf:shipr:state:model-ready",
+      "to": "opf:shipr:interaction:run-model",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:37",
+      "type": "contains",
+      "from": "opf:shipr:state:model-ready",
+      "to": "opf:shipr:interaction:run-attempt",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:allows:38",
+      "type": "allows",
+      "from": "opf:shipr:state:model-ready",
+      "to": "opf:shipr:interaction:run-model"
+    },
+    {
+      "id": "opf:shipr:rel:allows:39",
+      "type": "allows",
+      "from": "opf:shipr:state:model-ready",
+      "to": "opf:shipr:interaction:run-attempt"
+    },
+    {
+      "id": "opf:shipr:rel:uses:40",
+      "type": "uses",
+      "from": "opf:shipr:moment:write-model",
+      "to": "opf:shipr:surface:cli"
+    },
+    {
+      "id": "opf:shipr:rel:uses:41",
+      "type": "uses",
+      "from": "opf:shipr:moment:write-model",
+      "to": "opf:shipr:surface:release-model-file"
+    },
+    {
+      "id": "opf:shipr:rel:uses:42",
+      "type": "uses",
+      "from": "opf:shipr:moment:record-attempt",
+      "to": "opf:shipr:surface:cli"
+    },
+    {
+      "id": "opf:shipr:rel:uses:43",
+      "type": "uses",
+      "from": "opf:shipr:moment:read-frontier",
+      "to": "opf:shipr:surface:cli"
+    },
+    {
+      "id": "opf:shipr:rel:serves:44",
+      "type": "serves",
+      "from": "opf:shipr:journey:ship-with-config",
+      "to": "opf:shipr:outcome:repeatable-release"
+    },
+    {
+      "id": "opf:shipr:rel:serves:45",
+      "type": "serves",
+      "from": "opf:shipr:surface:cli",
+      "to": "opf:shipr:outcome:repeatable-release"
+    },
+    {
+      "id": "opf:shipr:rel:contains:46",
+      "type": "contains",
+      "from": "opf:shipr:area:governance",
+      "to": "opf:shipr:authority:maintainers",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:47",
+      "type": "contains",
+      "from": "opf:shipr:area:governance",
+      "to": "opf:shipr:decision:config-not-runner",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:governed-by:48",
+      "type": "governed-by",
+      "from": "opf:shipr:decision:config-not-runner",
+      "to": "opf:shipr:authority:maintainers"
+    },
+    {
+      "id": "opf:shipr:rel:decides:49",
+      "type": "decides",
+      "from": "opf:shipr:decision:config-not-runner",
+      "to": "opf:shipr:promise:durable-ship-config"
+    },
+    {
+      "id": "opf:shipr:rel:contains:50",
+      "type": "contains",
+      "from": "opf:shipr:area:governance",
+      "to": "opf:shipr:decision:go-canonical",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:governed-by:51",
+      "type": "governed-by",
+      "from": "opf:shipr:decision:go-canonical",
+      "to": "opf:shipr:authority:maintainers"
+    },
+    {
+      "id": "opf:shipr:rel:decides:52",
+      "type": "decides",
+      "from": "opf:shipr:decision:go-canonical",
+      "to": "opf:shipr:promise:durable-ship-config"
+    },
+    {
+      "id": "opf:shipr:rel:contains:53",
+      "type": "contains",
+      "from": "opf:shipr:area:governance",
+      "to": "opf:shipr:decision:absorb-testr",
+      "order": 3
+    },
+    {
+      "id": "opf:shipr:rel:governed-by:54",
+      "type": "governed-by",
+      "from": "opf:shipr:decision:absorb-testr",
+      "to": "opf:shipr:authority:maintainers"
+    },
+    {
+      "id": "opf:shipr:rel:decides:55",
+      "type": "decides",
+      "from": "opf:shipr:decision:absorb-testr",
+      "to": "opf:shipr:surface:release-model-file"
+    },
+    {
+      "id": "opf:shipr:rel:contains:56",
+      "type": "contains",
+      "from": "opf:shipr:area:governance",
+      "to": "opf:shipr:decision:ship-forge-merge",
+      "order": 4
+    },
+    {
+      "id": "opf:shipr:rel:governed-by:57",
+      "type": "governed-by",
+      "from": "opf:shipr:decision:ship-forge-merge",
+      "to": "opf:shipr:authority:maintainers"
+    },
+    {
+      "id": "opf:shipr:rel:decides:58",
+      "type": "decides",
+      "from": "opf:shipr:decision:ship-forge-merge",
+      "to": "opf:shipr:promise:durable-ship-config"
+    },
+    {
+      "id": "opf:shipr:rel:contains:59",
+      "type": "contains",
+      "from": "opf:shipr:area:delivery",
+      "to": "opf:shipr:work:go-port",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:60",
+      "type": "contains",
+      "from": "opf:shipr:area:delivery",
+      "to": "opf:shipr:work:ship-forge-absorb",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:implements:61",
+      "type": "implements",
+      "from": "opf:shipr:work:go-port",
+      "to": "opf:shipr:promise:durable-ship-config"
+    },
+    {
+      "id": "opf:shipr:rel:implements:62",
+      "type": "implements",
+      "from": "opf:shipr:work:go-port",
+      "to": "opf:shipr:surface:cli"
+    },
+    {
+      "id": "opf:shipr:rel:implements:63",
+      "type": "implements",
+      "from": "opf:shipr:work:ship-forge-absorb",
+      "to": "opf:shipr:decision:ship-forge-merge"
+    },
+    {
+      "id": "opf:shipr:rel:serves:64",
+      "type": "serves",
+      "from": "opf:shipr:work:go-port",
+      "to": "opf:shipr:outcome:repeatable-release"
+    },
+    {
+      "id": "opf:shipr:rel:contains:65",
+      "type": "contains",
+      "from": "opf:shipr:area:assurance",
+      "to": "opf:shipr:evidence:github-main",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:66",
+      "type": "contains",
+      "from": "opf:shipr:area:assurance",
+      "to": "opf:shipr:proof:go-test",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:contains:67",
+      "type": "contains",
+      "from": "opf:shipr:area:assurance",
+      "to": "opf:shipr:proof:testr-absorb",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:supported-by:68",
+      "type": "supported-by",
+      "from": "opf:shipr:promise:durable-ship-config",
+      "to": "opf:shipr:evidence:github-main"
+    },
+    {
+      "id": "opf:shipr:rel:verified-by:69",
+      "type": "verified-by",
+      "from": "opf:shipr:surface:cli",
+      "to": "opf:shipr:proof:go-test"
+    },
+    {
+      "id": "opf:shipr:rel:verified-by:70",
+      "type": "verified-by",
+      "from": "opf:shipr:decision:absorb-testr",
+      "to": "opf:shipr:proof:testr-absorb"
+    },
+    {
+      "id": "opf:shipr:rel:contains:71",
+      "type": "contains",
+      "from": "opf:shipr:area:gaps",
+      "to": "opf:shipr:gap:store-stub",
+      "order": 0
+    },
+    {
+      "id": "opf:shipr:rel:contains:72",
+      "type": "contains",
+      "from": "opf:shipr:area:gaps",
+      "to": "opf:shipr:gap:methods-absorb",
+      "order": 1
+    },
+    {
+      "id": "opf:shipr:rel:contains:73",
+      "type": "contains",
+      "from": "opf:shipr:area:gaps",
+      "to": "opf:shipr:gap:config-tracked",
+      "order": 2
+    },
+    {
+      "id": "opf:shipr:rel:blocks:74",
+      "type": "blocks",
+      "from": "opf:shipr:gap:store-stub",
+      "to": "opf:shipr:surface:cli"
+    },
+    {
+      "id": "opf:shipr:rel:blocks:75",
+      "type": "blocks",
+      "from": "opf:shipr:gap:methods-absorb",
+      "to": "opf:shipr:work:ship-forge-absorb"
+    },
+    {
+      "id": "opf:shipr:rel:blocks:76",
+      "type": "blocks",
+      "from": "opf:shipr:gap:config-tracked",
+      "to": "opf:shipr:promise:durable-ship-config"
+    },
+    {
+      "id": "opf:shipr:rel:depends-on:77",
+      "type": "depends-on",
+      "from": "opf:shipr:decision:absorb-testr",
+      "to": "opf:shipr:promise:durable-ship-config"
+    }
+  ],
+  "events": [
+    {
+      "id": "opf:shipr:product:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:product"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created product Shipr"
+    },
+    {
+      "id": "opf:shipr:area:intent:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:area:intent"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created area Intent"
+    },
+    {
+      "id": "opf:shipr:area:experience:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:area:experience"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created area Experience"
+    },
+    {
+      "id": "opf:shipr:area:governance:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:area:governance"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created area Decisions and authority"
+    },
+    {
+      "id": "opf:shipr:area:delivery:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:area:delivery"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created area Promises and work"
+    },
+    {
+      "id": "opf:shipr:area:assurance:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:area:assurance"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created area Evidence and proof"
+    },
+    {
+      "id": "opf:shipr:area:gaps:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:area:gaps"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created area Unresolved gaps"
+    },
+    {
+      "id": "opf:shipr:intent:repeatable-ship-config:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:intent:repeatable-ship-config"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created intent Make how-each-product-ships durable for AI agents"
+    },
+    {
+      "id": "opf:shipr:user:coding-agent:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:user:coding-agent"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created user Coding agent"
+    },
+    {
+      "id": "opf:shipr:user:human-releaser:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:user:human-releaser"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created user Human releaser"
+    },
+    {
+      "id": "opf:shipr:problem:ephemeral-release-knowledge:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:problem:ephemeral-release-knowledge"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created problem Release knowledge dies between sessions"
+    },
+    {
+      "id": "opf:shipr:promise:durable-ship-config:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:promise:durable-ship-config"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created promise Per-product ship config + attempt ledger under .shipr/"
+    },
+    {
+      "id": "opf:shipr:outcome:repeatable-release:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:outcome:repeatable-release"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created outcome Any agent can ship the same product the same way"
+    },
+    {
+      "id": "opf:shipr:journey:ship-with-config:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:journey:ship-with-config"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created journey Ship using durable config"
+    },
+    {
+      "id": "opf:shipr:moment:write-model:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:moment:write-model"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created moment Write or refresh release model"
+    },
+    {
+      "id": "opf:shipr:moment:run-proofs:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:moment:run-proofs"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created moment Agent runs proof_commands"
+    },
+    {
+      "id": "opf:shipr:moment:record-attempt:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:moment:record-attempt"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created moment Record release attempt"
+    },
+    {
+      "id": "opf:shipr:moment:read-frontier:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:moment:read-frontier"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created moment Read release frontier"
+    },
+    {
+      "id": "opf:shipr:surface:cli:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:surface:cli"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created surface shipr CLI (Go)"
+    },
+    {
+      "id": "opf:shipr:surface:release-model-file:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:surface:release-model-file"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created surface .shipr/product-release-model.json"
+    },
+    {
+      "id": "opf:shipr:state:model-ready:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:state:model-ready"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created state Model ready"
+    },
+    {
+      "id": "opf:shipr:state:attempt-blocked:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:state:attempt-blocked"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created state Attempt blocked"
+    },
+    {
+      "id": "opf:shipr:interaction:run-model:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:interaction:run-model"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created interaction shipr model --write"
+    },
+    {
+      "id": "opf:shipr:interaction:run-attempt:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:interaction:run-attempt"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created interaction shipr attempt"
+    },
+    {
+      "id": "opf:shipr:authority:maintainers:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:authority:maintainers"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created authority Shipr maintainers (Eidos AGI)"
+    },
+    {
+      "id": "opf:shipr:decision:config-not-runner:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:config-not-runner"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created decision Shipr is AI config and memory, not a ship runner"
+    },
+    {
+      "id": "opf:shipr:decision:config-not-runner:accepted-event",
+      "type": "accepted",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:config-not-runner"
+      ],
+      "actor": "human:daniel",
+      "detail": "Accepted: Shipr is AI config and memory, not a ship runner"
+    },
+    {
+      "id": "opf:shipr:decision:go-canonical:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:go-canonical"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created decision Go CLI is canonical"
+    },
+    {
+      "id": "opf:shipr:decision:go-canonical:accepted-event",
+      "type": "accepted",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:go-canonical"
+      ],
+      "actor": "human:daniel",
+      "detail": "Accepted: Go CLI is canonical"
+    },
+    {
+      "id": "opf:shipr:decision:absorb-testr:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:absorb-testr"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created decision Prefer testr test_commands as proof_commands"
+    },
+    {
+      "id": "opf:shipr:decision:absorb-testr:accepted-event",
+      "type": "accepted",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:absorb-testr"
+      ],
+      "actor": "human:daniel",
+      "detail": "Accepted: Prefer testr test_commands as proof_commands"
+    },
+    {
+      "id": "opf:shipr:decision:ship-forge-merge:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:ship-forge-merge"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created decision Absorb ship-forge methods into shipr"
+    },
+    {
+      "id": "opf:shipr:decision:ship-forge-merge:accepted-event",
+      "type": "accepted",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:decision:ship-forge-merge"
+      ],
+      "actor": "human:daniel",
+      "detail": "Accepted: Absorb ship-forge methods into shipr"
+    },
+    {
+      "id": "opf:shipr:work:go-port:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:work:go-port"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created work Go port of shipr CLI"
+    },
+    {
+      "id": "opf:shipr:work:ship-forge-absorb:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:work:ship-forge-absorb"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created work Absorb ship-forge methods"
+    },
+    {
+      "id": "opf:shipr:evidence:github-main:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:evidence:github-main"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created evidence eidos-agi/shipr main"
+    },
+    {
+      "id": "opf:shipr:proof:go-test:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:proof:go-test"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created proof go test ./... passes"
+    },
+    {
+      "id": "opf:shipr:proof:testr-absorb:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:proof:testr-absorb"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created proof proof_source testr when .testr exists"
+    },
+    {
+      "id": "opf:shipr:gap:store-stub:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:gap:store-stub"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created gap Go store marketplace write incomplete"
+    },
+    {
+      "id": "opf:shipr:gap:methods-absorb:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:gap:methods-absorb"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created gap ship-forge method files not fully absorbed"
+    },
+    {
+      "id": "opf:shipr:gap:config-tracked:created-event",
+      "type": "created",
+      "at": "2026-08-08T19:30:00Z",
+      "subjects": [
+        "opf:shipr:gap:config-tracked"
+      ],
+      "actor": "agent:grok",
+      "detail": "Created gap Need committed .shipr/.testr config policy"
+    }
+  ]
+}
