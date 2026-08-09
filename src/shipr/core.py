@@ -15,7 +15,6 @@ from typing import Any
 
 MODEL_PATH = Path(".shipr/product-release-model.json")
 ATTEMPTS_DIR = Path(".shipr/release-attempts")
-SHIPR_IGNORE_ENTRY = ".shipr/"
 
 BLOCKER_CLASSIFICATIONS: dict[str, dict[str, str]] = {
     "git-clean-pushed": {
@@ -155,25 +154,39 @@ def _project_uses_git(root: Path) -> bool:
     return (root / ".git").exists() or (root / ".gitignore").exists()
 
 
-def _has_shipr_ignore(lines: list[str]) -> bool:
-    ignored_forms = {".shipr", ".shipr/", ".shipr/*", ".shipr/**"}
-    return any(line.strip() in ignored_forms for line in lines)
+_CONFIG_IGNORE_FORMS = {
+    ".shipr",
+    ".shipr/",
+    ".shipr/*",
+    ".shipr/**",
+    ".testr",
+    ".testr/",
+    ".testr/*",
+    ".testr/**",
+}
 
 
 def ensure_shipr_ignored(project: Path) -> Path | None:
-    """Keep Shipr's local release memory out of source-control status noise."""
+    """Legacy name: strip .shipr/.testr ignores so configs are trackable."""
+    return ensure_configs_tracked(project)
+
+
+def ensure_configs_tracked(project: Path) -> Path | None:
+    """Remove .shipr/ and .testr/ ignore rules. Configs are committed product state."""
     root = project.resolve()
-    if not _project_uses_git(root):
-        return None
-
     gitignore = root / ".gitignore"
-    text = gitignore.read_text() if gitignore.exists() else ""
-    if _has_shipr_ignore(text.splitlines()):
+    if not gitignore.exists():
         return None
-
-    if text and not text.endswith("\n"):
+    lines = gitignore.read_text().splitlines()
+    keep = [ln for ln in lines if ln.strip() not in _CONFIG_IGNORE_FORMS]
+    if keep == lines:
+        return None
+    while keep and keep[-1] == "":
+        keep.pop()
+    text = "\n".join(keep)
+    if text:
         text += "\n"
-    gitignore.write_text(f"{text}{SHIPR_IGNORE_ENTRY}\n")
+    gitignore.write_text(text)
     return gitignore
 
 

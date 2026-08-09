@@ -14,10 +14,9 @@ import (
 const (
 	ModelRelPath   = ".shipr/product-release-model.json"
 	AttemptsRelDir = ".shipr/release-attempts"
-	IgnoreEntry    = ".shipr/"
 	TestrModelRel  = ".testr/product-test-model.json"
 	// Version is the Go CLI / config schema generation version.
-	Version = "0.3.0"
+	Version = "0.3.1"
 )
 
 // ReleaseModel is the durable per-product ship config AI agents read.
@@ -30,23 +29,114 @@ func exists(root string, parts ...string) bool {
 	return err == nil
 }
 
-func ensureIgnored(root string) {
-	if !exists(root, ".git") && !exists(root, ".gitignore") {
+// configIgnoreForms must never appear in product .gitignore.
+// .shipr/ and .testr/ are committed product config, not local noise.
+var configIgnoreForms = map[string]struct{}{
+	".shipr": {}, ".shipr/": {}, ".shipr/*": {}, ".shipr/**": {},
+	".testr": {}, ".testr/": {}, ".testr/*": {}, ".testr/**": {},
+}
+
+// ensureNotGitignored strips .shipr/.testr ignore rules so configs can be tracked.
+func ensureNotGitignored(root string) {
+	gi := filepath.Join(root, ".gitignore")
+	b, err := os.ReadFile(gi)
+	if err != nil {
 		return
 	}
-	gi := filepath.Join(root, ".gitignore")
-	b, _ := os.ReadFile(gi)
-	text := string(b)
-	for _, line := range strings.Split(text, "\n") {
+	lines := strings.Split(string(b), "\n")
+	var keep []string
+	changed := false
+	for _, line := range lines {
 		s := strings.TrimSpace(line)
-		if s == ".shipr" || s == ".shipr/" || s == ".shipr/*" || s == ".shipr/**" {
-			return
+		if _, drop := configIgnoreForms[s]; drop {
+			changed = true
+			continue
+		}
+		keep = append(keep, line)
+	}
+	if !changed {
+		return
+	}
+	for len(keep) > 0 && keep[len(keep)-1] == "" {
+		keep = keep[:len(keep)-1]
+	}
+	out := strings.Join(keep, "\n")
+	if out != "" {
+		out += "\n"
+	}
+	_ = os.WriteFile(gi, []byte(out), 0o644)
+}
+
+// bootstrapTestrModel writes a minimal testr config when shipr creates a product
+// that has no .testr model yet (sibling ensure).
+func bootstrapTestrModel(root string, ship ReleaseModel) map[string]any {
+	product, _ := ship["product_id"].(string)
+	if product == "" {
+		product = filepath.Base(root)
+	}
+	cmds := stringSlice(ship["proof_commands"])
+	if len(cmds) == 0 {
+		if exists(root, "go.mod") {
+			cmds = append(cmds, "go test ./...", "go build ./...")
+		}
+		if exists(root, "pyproject.toml") || exists(root, "tests") {
+			cmds = append(cmds, "python -m pytest -q")
+		}
+		if len(cmds) == 0 {
+			cmds = []string{"define product-specific test command before claiming green"}
 		}
 	}
-	if text != "" && !strings.HasSuffix(text, "\n") {
-		text += "\n"
+	return map[string]any{
+		"schema_version":    1,
+		"role":              "ai_config_and_memory",
+		"purpose":           "Tell AI agents how this product is proven. Store repeatable test config and attempt ledgers. Does not execute tests.",
+		"product_id":        product,
+		"project_root":      root,
+		"description":       "bootstrapped by shipr (sibling ensure)",
+		"test_suites":       []string{},
+		"test_commands":     uniqueKeepOrder(cmds),
+		"evidence_paths":    []string{"test output / junit / coverage when configured"},
+		"methods_source":    "bootstrapped-by-shipr",
+		"related_operators": []string{"shipr"},
+		"related_shipr": map[string]any{
+			"operator":   "shipr",
+			"model_path": ModelRelPath,
+			"loaded":     true,
+			"note":       "shipr should use these test_commands as proof_commands when shipping",
+		},
+		"learning_questions": []string{
+			"What failed that the ship path assumed green?",
+			"Which test should become a shipr proof_command?",
+			"What is flaky vs broken?",
+		},
+		"memory_paths": map[string]string{
+			"model":        TestrModelRel,
+			"attempts_dir": ".testr/test-attempts",
+		},
+		"updated_at": time.Now().UTC().Format(time.RFC3339Nano),
 	}
-	_ = os.WriteFile(gi, []byte(text+IgnoreEntry+"\n"), 0o644)
+}
+
+// EnsureProductConfigs strips ignore rules and creates missing .shipr / .testr models.
+func EnsureProductConfigs(project string) error {
+	root, _ := filepath.Abs(project)
+	ensureNotGitignored(root)
+	if !exists(root, ModelRelPath) {
+		m := DetectReleaseModel(root, "")
+		if err := writeJSON(filepath.Join(root, ModelRelPath), m); err != nil {
+			return err
+		}
+	}
+	if !exists(root, TestrModelRel) {
+		ship, err := LoadReleaseModel(root)
+		if err != nil {
+			ship = DetectReleaseModel(root, "")
+		}
+		if err := writeJSON(filepath.Join(root, TestrModelRel), bootstrapTestrModel(root, ship)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func declaredLicense(root string) any {
@@ -300,9 +390,16 @@ func writeJSON(path string, v any) error {
 
 func WriteReleaseModel(project string, model ReleaseModel) (string, error) {
 	root, _ := filepath.Abs(project)
-	ensureIgnored(root)
+	ensureNotGitignored(root)
 	path := filepath.Join(root, ModelRelPath)
-	return path, writeJSON(path, model)
+	if err := writeJSON(path, model); err != nil {
+		return path, err
+	}
+	// Sibling: create .testr model if missing (do not overwrite).
+	if !exists(root, TestrModelRel) {
+		_ = writeJSON(filepath.Join(root, TestrModelRel), bootstrapTestrModel(root, model))
+	}
+	return path, nil
 }
 
 func LoadReleaseModel(project string) (ReleaseModel, error) {
@@ -352,10 +449,11 @@ func nextActions(status string, blockers []string) []string {
 // RecordAttempt appends a release-attempt ledger entry. It does not execute proofs.
 func RecordAttempt(project, goal, status, notes string, proofs, blockers []string) (string, map[string]any, error) {
 	root, _ := filepath.Abs(project)
-	ensureIgnored(root)
+	_ = EnsureProductConfigs(root)
 	model, err := LoadReleaseModel(root)
 	if err != nil {
 		model = DetectReleaseModel(root, "")
+		_, _ = WriteReleaseModel(root, model)
 	}
 	ts := time.Now().UTC().Format("20060102T150405Z")
 	path := filepath.Join(root, AttemptsRelDir, ts+"-"+slug(goal)+".json")

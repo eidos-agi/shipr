@@ -23,7 +23,7 @@ ship-forge does **not** stay a parallel brand. It becomes a **pointer** to shipr
 
 - Do not delete ship-forge git history.
 - Do not absorb security-forge / foss-forge wholesale in phase 1.
-- Do not force-commit `.shipr/release-attempts/` (stay local by default).
+- `.shipr/` and `.testr/` are committed product config (not gitignored).
 - Do not break existing `shipr model|attempt|frontier|store` CLI.
 
 ## Architecture after merge
@@ -31,7 +31,7 @@ ship-forge does **not** stay a parallel brand. It becomes a **pointer** to shipr
 ```text
 shipr (product)
 ├── Go CLI (canonical)    model / attempt / frontier / store  — config only
-├── .shipr/               per-repo product-release-model + attempts (gitignored)
+├── .shipr/               per-repo product-release-model + attempts (committed)
 ├── docs/methods/         ← absorbed ship-forge skills content
 ├── templates/            ← absorbed ship-forge CI/gitignore/pre-commit templates
 └── skills/use-shipr      agent entry: read model → AI runs proofs → record

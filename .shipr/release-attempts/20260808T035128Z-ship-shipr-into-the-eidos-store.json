@@ -1,0 +1,67 @@
+{
+  "blocker_records": [],
+  "blockers": [],
+  "created_at": "2026-08-08T03:51:28.125832+00:00",
+  "gate_summary": [],
+  "goal": "ship shipr into the eidos store",
+  "learning_prompts": [
+    "What broke or slowed this release?",
+    "What proof was missing until late?",
+    "Which gate should become automatic next time?",
+    "Which human approval should remain explicit?"
+  ],
+  "next_actions": [
+    "route lessons to learning-forge",
+    "watch rollback and support signals"
+  ],
+  "notes": "shipr store: copied files + added store manifest entry",
+  "product_id": "shipr",
+  "proofs": [
+    "test -d /private/tmp/eidos-marketplace-shipr-pr.OvG70V/worktree/plugins/shipr",
+    "grep -q '\"shipr\"' /private/tmp/eidos-marketplace-shipr-pr.OvG70V/worktree/.claude-plugin/marketplace.json"
+  ],
+  "release_model_snapshot": {
+    "approval_gates": [
+      "credentials",
+      "payments",
+      "production mutations",
+      "public publish/tag",
+      "customer/outbound messaging"
+    ],
+    "artifact_types": [
+      "docs",
+      "eidos-plugin",
+      "plugin-marketplace",
+      "python-package"
+    ],
+    "distribution_channels": [
+      "Codex/Claude plugin marketplace",
+      "Eidos AGI marketplace",
+      "PyPI or uvx"
+    ],
+    "forge_stack": [
+      "forge-forge",
+      "ship-forge",
+      "security-forge",
+      "foss-forge",
+      "learning-forge",
+      "loss-forge"
+    ],
+    "license": "MIT",
+    "open_source_status": "ready",
+    "proof_commands": [
+      "python -m pytest -q",
+      "python -m ruff check .",
+      "python -m ruff format --check .",
+      "python tools/marketplace_publish.py check <plugin> --source <source-repo>",
+      "codex plugin list --marketplace eidos-agi",
+      "codex plugin add <plugin>@eidos-agi",
+      "python -m pytest tests/test_marketplace_publish.py -q",
+      "verify README, changelog, and release notes match artifact version"
+    ],
+    "repository_visibility": "public"
+  },
+  "schema_version": 1,
+  "source": null,
+  "status": "shipped"
+}

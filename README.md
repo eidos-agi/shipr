@@ -69,12 +69,14 @@ shipr model --project . --write --json   # proofs pull from testr
 
 ```text
 .shipr/
-  product-release-model.json   # how this product ships (AI how-to)
-  release-attempts/            # ledger of release tries
+  product-release-model.json   # how this product ships (AI how-to) — **committed**
+  release-attempts/            # ledger of release tries — **committed**
+.testr/
+  product-test-model.json      # sibling test config — created if missing — **committed**
 ```
 
-`.shipr/` is gitignored by default when Shipr writes it — local operator memory,
-not product source.
+`.shipr/` and `.testr/` are **product config, not gitignored**. Shipr strips
+those ignore rules if present and creates missing sibling models on write.
 
 ## Design
 

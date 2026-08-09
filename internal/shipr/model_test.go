@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -98,5 +99,44 @@ func TestWriteAndLoadAndAttempt(t *testing.T) {
 	}
 	if fr["role"] != "ai_config_and_memory" {
 		t.Fatalf("frontier role: %v", fr["role"])
+	}
+}
+
+func TestWriteDoesNotGitignoreAndCreatesSibling(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "go.mod"), "module example.com/p\n\ngo 1.22\n")
+	writeFile(t, filepath.Join(dir, ".gitignore"), "node_modules/\n.shipr/\n.testr/\n*.log\n")
+	m := DetectReleaseModel(dir, "")
+	// force no testr absorb path
+	path, err := WriteReleaseModel(dir, m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(path); err != nil {
+		t.Fatal(err)
+	}
+	// sibling testr created
+	if _, err := os.Stat(filepath.Join(dir, TestrModelRel)); err != nil {
+		t.Fatalf("expected sibling testr model: %v", err)
+	}
+	gi, _ := os.ReadFile(filepath.Join(dir, ".gitignore"))
+	text := string(gi)
+	if strings.Contains(text, ".shipr/") || strings.Contains(text, ".testr/") {
+		t.Fatalf("gitignore still ignores configs:\n%s", text)
+	}
+	if !strings.Contains(text, "node_modules/") {
+		t.Fatalf("lost other ignore lines: %s", text)
+	}
+}
+
+func TestEnsureProductConfigsCreatesBoth(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "go.mod"), "module example.com/p\n\ngo 1.22\n")
+	writeFile(t, filepath.Join(dir, ".gitignore"), ".shipr/\n")
+	if err := EnsureProductConfigs(dir); err != nil {
+		t.Fatal(err)
+	}
+	if !exists(dir, ModelRelPath) || !exists(dir, TestrModelRel) {
+		t.Fatal("expected both models")
 	}
 }

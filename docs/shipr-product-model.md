@@ -34,9 +34,13 @@ If `.testr/product-test-model.json` exists, its `test_commands` are preferred as
 ## Storage
 
 ```text
-.shipr/product-release-model.json
-.shipr/release-attempts/
+.shipr/product-release-model.json   # committed product config
+.shipr/release-attempts/            # committed ledger
+.testr/product-test-model.json      # sibling; created if missing
 ```
+
+`.shipr/` and `.testr/` are **not** gitignored. Shipr strips those ignore rules
+on write and creates a missing testr model when it writes a release model.
 
 Release attempts may include structured evidence (proofs, blockers, next_actions).
 Knowledge stays next to the product so each ship improves the next one — for the AI.

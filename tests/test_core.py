@@ -277,25 +277,31 @@ def test_frontier_surfaces_recurring_blockers(tmp_path: Path) -> None:
     )
 
 
-def test_write_model_ignores_shipr_memory_in_git_project(tmp_path: Path) -> None:
+def test_write_model_does_not_gitignore_shipr(tmp_path: Path) -> None:
     (tmp_path / ".git").mkdir()
     (tmp_path / "pyproject.toml").write_text("[project]\nname='demo'\n")
 
     write_release_model(tmp_path, detect_release_model(tmp_path))
 
-    assert ".shipr/" in (tmp_path / ".gitignore").read_text().splitlines()
+    gi = tmp_path / ".gitignore"
+    if gi.exists():
+        assert ".shipr/" not in gi.read_text().splitlines()
+        assert ".testr/" not in gi.read_text().splitlines()
 
 
-def test_record_attempt_does_not_duplicate_shipr_ignore(tmp_path: Path) -> None:
+def test_record_attempt_strips_shipr_ignore(tmp_path: Path) -> None:
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".gitignore").write_text("node_modules/\n.shipr/\n")
+    (tmp_path / ".gitignore").write_text("node_modules/\n.shipr/\n.testr/\n")
     (tmp_path / "pyproject.toml").write_text("[project]\nname='demo'\n")
 
     record_attempt(tmp_path, goal="ship demo")
 
-    assert (tmp_path / ".gitignore").read_text().splitlines().count(".shipr/") == 1
+    lines = (tmp_path / ".gitignore").read_text().splitlines()
+    assert ".shipr/" not in lines
+    assert ".testr/" not in lines
+    assert "node_modules/" in lines
 
 
-def test_ensure_shipr_ignored_leaves_non_git_project_alone(tmp_path: Path) -> None:
+def test_ensure_configs_tracked_leaves_non_git_project_alone(tmp_path: Path) -> None:
     assert ensure_shipr_ignored(tmp_path) is None
     assert not (tmp_path / ".gitignore").exists()

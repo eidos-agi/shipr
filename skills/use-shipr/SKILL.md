@@ -52,3 +52,7 @@ go install github.com/eidos-agi/shipr/cmd/shipr@latest
 
 Stop before public tags, package publishes, production deploys, credentials,
 payments, and outbound announcements unless the user explicitly approves.
+
+## Tracked config
+
+`.shipr/` and `.testr/` are committed product config. Tools strip ignore rules and create missing sibling models on write.

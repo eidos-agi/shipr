@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 - 2026-08-08
+
+- **Track configs:** `.shipr/` and `.testr/` are product config, not gitignored.
+  Shipr strips those ignore rules and creates a missing sibling testr model on write.
+- `EnsureProductConfigs` materializes both models when recording attempts.
+
 ## 0.3.0 - 2026-08-08
 
 - **Go is canonical** (`cmd/shipr`, `go install`). Python CLI demoted to legacy.

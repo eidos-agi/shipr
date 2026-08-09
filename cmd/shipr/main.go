@@ -41,9 +41,9 @@ Usage:
   shipr frontier [--project PATH] [--json]
   shipr store [--project PATH] --marketplace PATH [--check] [--json]
 
-Config file:  .shipr/product-release-model.json
-Ledger:       .shipr/release-attempts/
-Sibling:      testr (.testr/) — test_commands become proof_commands when present
+Config file:  .shipr/product-release-model.json  (committed; not gitignored)
+Ledger:       .shipr/release-attempts/           (committed)
+Sibling:      testr (.testr/) created if missing — test_commands become proofs
 `, shipr.Version)
 }
 

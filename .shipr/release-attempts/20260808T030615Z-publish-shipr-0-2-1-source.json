@@ -1,0 +1,67 @@
+{
+  "blocker_records": [],
+  "blockers": [],
+  "created_at": "2026-08-08T03:06:15.188734+00:00",
+  "gate_summary": [],
+  "goal": "publish Shipr 0.2.1 source",
+  "learning_prompts": [
+    "What broke or slowed this release?",
+    "What proof was missing until late?",
+    "Which gate should become automatic next time?",
+    "Which human approval should remain explicit?"
+  ],
+  "next_actions": [
+    "route lessons to learning-forge",
+    "watch rollback and support signals"
+  ],
+  "notes": "",
+  "product_id": "shipr",
+  "proofs": [
+    "git main 841154e pushed",
+    "GitHub Actions CI 31236444560 passed"
+  ],
+  "release_model_snapshot": {
+    "approval_gates": [
+      "credentials",
+      "payments",
+      "production mutations",
+      "public publish/tag",
+      "customer/outbound messaging"
+    ],
+    "artifact_types": [
+      "docs",
+      "eidos-plugin",
+      "plugin-marketplace",
+      "python-package"
+    ],
+    "distribution_channels": [
+      "Codex/Claude plugin marketplace",
+      "Eidos AGI marketplace",
+      "PyPI or uvx"
+    ],
+    "forge_stack": [
+      "forge-forge",
+      "ship-forge",
+      "security-forge",
+      "foss-forge",
+      "learning-forge",
+      "loss-forge"
+    ],
+    "license": "MIT",
+    "open_source_status": "ready",
+    "proof_commands": [
+      "python -m pytest -q",
+      "python -m ruff check .",
+      "python -m ruff format --check .",
+      "python tools/marketplace_publish.py check <plugin> --source <source-repo>",
+      "codex plugin list --marketplace eidos-agi",
+      "codex plugin add <plugin>@eidos-agi",
+      "python -m pytest tests/test_marketplace_publish.py -q",
+      "verify README, changelog, and release notes match artifact version"
+    ],
+    "repository_visibility": "public"
+  },
+  "schema_version": 1,
+  "source": null,
+  "status": "shipped"
+}

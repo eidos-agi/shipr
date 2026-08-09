@@ -17,9 +17,12 @@ Go binary: `go install ./cmd/shipr` (or `@latest`). Python `src/shipr/` is legac
 ## Per-product files
 
 ```text
-.shipr/product-release-model.json   # how this product ships
-.shipr/release-attempts/            # ledger (gitignored)
+.shipr/product-release-model.json   # how this product ships (committed)
+.shipr/release-attempts/            # ledger (committed)
+.testr/product-test-model.json      # sibling test config (created if missing, committed)
 ```
+
+Do **not** gitignore `.shipr/` or `.testr/`. Shipr removes those ignore lines on write.
 
 ## Workflow
 
