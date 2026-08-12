@@ -2,6 +2,7 @@ package shipr
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,7 +17,7 @@ const (
 	AttemptsRelDir = ".shipr/release-attempts"
 	TestrModelRel  = ".testr/product-test-model.json"
 	// Version is the Go CLI / config schema generation version.
-	Version = "0.3.2"
+	Version = "0.4.0"
 )
 
 // ReleaseModel is the durable per-product ship config AI agents read.
@@ -388,18 +389,9 @@ func writeJSON(path string, v any) error {
 	return os.WriteFile(path, b, 0o644)
 }
 
+// WriteReleaseModel writes only when the model file is missing (safe default).
 func WriteReleaseModel(project string, model ReleaseModel) (string, error) {
-	root, _ := filepath.Abs(project)
-	ensureNotGitignored(root)
-	path := filepath.Join(root, ModelRelPath)
-	if err := writeJSON(path, model); err != nil {
-		return path, err
-	}
-	// Sibling: create .testr model if missing (do not overwrite).
-	if !exists(root, TestrModelRel) {
-		_ = writeJSON(filepath.Join(root, TestrModelRel), bootstrapTestrModel(root, model))
-	}
-	return path, nil
+	return WriteReleaseModelForced(project, model, false)
 }
 
 func LoadReleaseModel(project string) (ReleaseModel, error) {
@@ -414,6 +406,63 @@ func LoadReleaseModel(project string) (ReleaseModel, error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+// ResolveReleaseModel returns the model agents should use.
+//
+// Contract (2027 kickstart):
+//  1. If .shipr/product-release-model.json exists → load it (source: committed).
+//  2. Else detect a starter model (source: detected) — never invent ceremony over a file.
+//
+// Detection is for greenfield only. Committed product policy always wins.
+func ResolveReleaseModel(project, description string) (ReleaseModel, string) {
+	root, _ := filepath.Abs(project)
+	if m, err := LoadReleaseModel(root); err == nil && m != nil {
+		m["model_source"] = "committed"
+		m["model_path"] = filepath.Join(root, ModelRelPath)
+		m["project_root"] = root
+		// When testr exists, surface its commands without clobbering committed proofs
+		// if the product already set proof_commands. Prefer committed proofs as-is.
+		if _, ok := m["proof_commands"]; !ok || len(stringSlice(m["proof_commands"])) == 0 {
+			if tc, path, ok := loadTestrProofs(root); ok {
+				m["proof_commands"] = uniqueKeepOrder(tc)
+				m["proof_source"] = "testr"
+				m["related_testr"] = map[string]any{
+					"model_path": TestrModelRel,
+					"loaded":     true,
+					"abs_path":   path,
+					"note":       "testr test_commands used because committed shipr proofs were empty",
+				}
+			}
+		}
+		return m, "committed"
+	}
+	m := DetectReleaseModel(project, description)
+	m["model_source"] = "detected"
+	m["model_path"] = filepath.Join(root, ModelRelPath)
+	m["detect_warning"] = "No committed .shipr/product-release-model.json. Detection invents starter proofs (often too heavy). Hand-edit, keep thin, commit, then never re-detect over it without --force."
+	return m, "detected"
+}
+
+// WriteReleaseModel writes the model. If a committed model already exists and
+// force is false, it refuses so agents cannot clobber product policy by accident.
+func WriteReleaseModelForced(project string, model ReleaseModel, force bool) (string, error) {
+	root, _ := filepath.Abs(project)
+	ensureNotGitignored(root)
+	path := filepath.Join(root, ModelRelPath)
+	if !force {
+		if _, err := os.Stat(path); err == nil {
+			return path, fmt.Errorf("%s already exists; refusing to overwrite product policy (pass --force to replace, or edit the file)", path)
+		}
+	}
+	if err := writeJSON(path, model); err != nil {
+		return path, err
+	}
+	// Sibling: create .testr model if missing (do not overwrite).
+	if !exists(root, TestrModelRel) {
+		_ = writeJSON(filepath.Join(root, TestrModelRel), bootstrapTestrModel(root, model))
+	}
+	return path, nil
 }
 
 func slug(text string) string {

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "shipr"
-version = "0.2.1"
+version = "0.4.0"
 description = "LEGACY Python CLI — prefer Go (cmd/shipr). AI shipping config + release memory; does not ship or run proofs."
 readme = "README.md"
 license = "MIT"

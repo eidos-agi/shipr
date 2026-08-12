@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+
+- **Committed model wins:** `shipr model` loads `.shipr/product-release-model.json` when present (`model_source: committed`).
+- Detection is greenfield-only; never invent ceremony over a committed file.
+- `--write` refuses to overwrite without `--force`.
+- CLI help, README, and `use-shipr` skill document the 2027 kickstart contract.
+
+
 ## 0.3.2 - 2026-08-09
 
 - Nanosecond attempt IDs for chronological frontiers under stress.

@@ -158,3 +158,42 @@ func TestFrontierUsesLatestAttemptByTime(t *testing.T) {
 		t.Fatalf("want latest_status=ready got %v (latest=%v)", fr["latest_status"], fr["latest_attempt"])
 	}
 }
+
+func TestResolveReleaseModelPrefersCommitted(t *testing.T) {
+	dir := t.TempDir()
+	// minimal package.json so detect would invent npm ceremony if used
+	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"x"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	committed := ReleaseModel{
+		"schema_version": 1,
+		"product_id":     "custom-product",
+		"proof_commands": []string{"git diff --check"},
+		"forbidden":      []string{"staging"},
+	}
+	if _, err := WriteReleaseModelForced(dir, committed, true); err != nil {
+		t.Fatal(err)
+	}
+	m, src := ResolveReleaseModel(dir, "")
+	if src != "committed" {
+		t.Fatalf("source=%s want committed", src)
+	}
+	if m["product_id"] != "custom-product" {
+		t.Fatalf("product_id=%v", m["product_id"])
+	}
+	proofs := stringSlice(m["proof_commands"])
+	if len(proofs) != 1 || proofs[0] != "git diff --check" {
+		t.Fatalf("proofs=%v (must not invent npm test)", proofs)
+	}
+}
+
+func TestWriteReleaseModelRefusesClobber(t *testing.T) {
+	dir := t.TempDir()
+	m := ReleaseModel{"schema_version": 1, "product_id": "x", "proof_commands": []string{"a"}}
+	if _, err := WriteReleaseModelForced(dir, m, true); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := WriteReleaseModel(dir, m); err == nil {
+		t.Fatal("expected refuse without force")
+	}
+}

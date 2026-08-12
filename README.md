@@ -1,7 +1,6 @@
 # Shipr
 
 > **AI shipping config + release memory** — not a deploy runner.  
-> Methods from [ship-forge](https://github.com/eidos-agi/ship-forge) merge here: [`docs/SHIP-FORGE-MERGE.md`](docs/SHIP-FORGE-MERGE.md).  
 > Sibling test config: [testr](https://github.com/eidos-agi/testr).
 
 [![CI](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml/badge.svg)](https://github.com/eidos-agi/shipr/actions/workflows/ci.yml)
@@ -9,22 +8,37 @@
 
 ## What this is
 
-**Shipr tells AI agents how a product ships**, and stores that config so the next
-session (or agent) can do it the same way.
+**`shipr` is the kickstart keyword for how a product ships.**
 
-It is **not** an app that ships, deploys, tags, or runs proof commands. The
-agent reads `.shipr/product-release-model.json`, runs the proofs itself, then
-records what happened with `shipr attempt`.
+It stores **how-this-product-ships** config and a release attempt ledger so the
+next agent session does not invent ceremony (staging, blanket CI, admin-merge
+as normal).
+
+It does **not** ship, deploy, tag, or run proof commands. The agent:
+
+1. **Loads the committed model** (source of truth)
+2. Runs path-relevant proofs itself
+3. Records the outcome with `shipr attempt`
 
 | Layer | Role |
 |-------|------|
 | **Config** | `.shipr/product-release-model.json` — channels, proofs, gates, rollback |
 | **Ledger** | `.shipr/release-attempts/` — what was tried and what broke |
-| **Frontier** | `shipr frontier` — what to do next (for the AI) |
+| **Frontier** | `shipr frontier` — what to do next |
 | **Sibling** | [testr](https://github.com/eidos-agi/testr) — how the product is *proven* |
 
-When `.testr/product-test-model.json` exists, Shipr **absorbs `test_commands`
-into `proof_commands`** so ship and test gates stay one story.
+## 2027 kickstart contract (read this)
+
+1. **Committed model wins.** If `.shipr/product-release-model.json` exists,
+   `shipr model` **loads it**. It does **not** re-detect over product policy.
+2. **Detection is greenfield only.** No file → starter detect (often too heavy).
+   Hand-edit thin, commit, done.
+3. **`--write` will not clobber.** Existing model → error unless `--force`.
+4. **Agents read the file (or `shipr model --json`).** Never treat raw detect
+   soup as policy when a file is present.
+5. **Path-relevant proofs.** Lists are menus, not mandatory full suites.
+6. **Human auth for irreversible steps.** Production deploy / public publish
+   stay explicit human gates; shipr only records them.
 
 ## Install (Go — canonical)
 
@@ -33,66 +47,78 @@ go install github.com/eidos-agi/shipr/cmd/shipr@latest
 # or from a clone:
 git clone https://github.com/eidos-agi/shipr.git && cd shipr
 go install ./cmd/shipr
-shipr version
+shipr version   # 0.4.0+
 ```
 
-Legacy Python (`pip install -e .`) remains under `src/shipr/` for a transition
-period. Prefer the Go binary.
+Legacy Python (`pip install -e .`) under `src/shipr/` is transitional.
 
 ## Use (agent workflow)
 
 ```bash
-# 1. Materialize ship config (AI will read this)
-shipr model --project /path/to/product --write --json
+# 1. Load THIS product's ship config (committed file if present)
+shipr model --project /path/to/product --json
 
-# 2. AI runs the listed proof_commands itself (pytest, go test, curl, …)
+# 2. YOU run path-relevant proof_commands from the model
 
 # 3. Record outcome (ledger only — no execute)
 shipr attempt --project /path/to/product \
-  --goal "publish marketplace plugin" \
-  --status ready \
-  --proof "go test ./..." \
+  --goal "production deploy canary" \
+  --status shipped \
+  --proof "gh pr merge … without --admin" \
+  --proof "workflow_dispatch deploy run …" \
+  --proof "curl health git_sha=…" \
   --json
 
-# 4. What's next for this product?
+# 4. What's next?
 shipr frontier --project /path/to/product --json
 ```
 
-Compose with testr on the same product:
+Compose with testr:
 
 ```bash
-testr model --project . --write --json   # test config first
-shipr model --project . --write --json   # proofs pull from testr
+testr model --project . --json          # load committed tests
+shipr model --project . --json          # load committed ship (proofs may mirror testr)
+# only for brand-new repos with no models:
+testr model --project . --write --json
+shipr model --project . --write --json
+```
+
+### Writing / replacing models
+
+```bash
+shipr model --project . --write --json          # create if missing only
+shipr model --project . --write --force --json  # replace committed model (rare)
 ```
 
 ## Durable state
 
 ```text
 .shipr/
-  product-release-model.json   # how this product ships (AI how-to) — **committed**
-  release-attempts/            # ledger of release tries — **committed**
+  product-release-model.json   # how this product ships — **committed SOURCE OF TRUTH**
+  release-attempts/            # ledger — **committed**
 .testr/
-  product-test-model.json      # sibling test config — created if missing — **committed**
+  product-test-model.json      # sibling proofs — **committed**
 ```
 
-`.shipr/` and `.testr/` are **product config, not gitignored**. Shipr strips
-those ignore rules if present and creates missing sibling models on write.
+`.shipr/` and `.testr/` are **product config, not gitignored**.
 
 ## Design
 
 - **Role:** `ai_config_and_memory` — config + ledger, not executor.
-- **Companions:** security-forge, foss-forge, learning-forge, loss-forge, **testr**.
-- **Visibility / license** detection still feeds `open_source_status` and
-  foss-forge routing in the model.
+- **Product-specific behavior lives in the committed model**, not in a second
+  parallel “custom ship system.” Generic detect is only a bootstrap.
+- **Optional fields** products may set: `forbidden`, `five_step_rule`,
+  `proof_command_notes`, deploy channel strings, approval gates.
 - **Approval boundary:** stop before public tags, package publishes, production
   deploys, credentials, payments, outbound announcements unless the human
-  explicitly approves. Shipr only stores that those gates exist.
+  explicitly approves.
 
 ## Docs
 
-- **OPF product graph:** [`docs/opf/`](docs/opf/) (`product.json` — validate with `python3 -m opf.validate docs/opf`)
 - Product model shape: [`docs/shipr-product-model.md`](docs/shipr-product-model.md)
+- Methods (generic playbooks): [`docs/methods/`](docs/methods/)
 - ship-forge → shipr: [`docs/SHIP-FORGE-MERGE.md`](docs/SHIP-FORGE-MERGE.md)
+- Agent skill: [`skills/use-shipr/SKILL.md`](skills/use-shipr/SKILL.md)
 
 ## License
 

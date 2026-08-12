@@ -34,16 +34,31 @@ func usage() {
 Shipr does NOT ship, deploy, or run proofs.
 It stores how-this-product-ships config so AI agents can ship repeatedly.
 
+2027 kickstart contract:
+  • Keyword "shipr" means: load THIS product's committed model and obey it.
+  • Committed .shipr/product-release-model.json ALWAYS wins over auto-detect.
+  • Detection is greenfield-only. Never treat detect output as product policy.
+  • Prefer path-relevant proofs. Do not invent blanket CI / staging ceremony.
+
 Usage:
-  shipr model [--project PATH] [--description TEXT] [--write] [--json]
+  shipr model [--project PATH] [--description TEXT] [--write] [--force] [--json]
   shipr attempt --goal TEXT [--project PATH] [--status planned|ready|blocked|shipped|rolled_back]
                 [--notes TEXT] [--proof TEXT ...] [--json]
   shipr frontier [--project PATH] [--json]
   shipr store [--project PATH] --marketplace PATH [--check] [--json]
 
-Config file:  .shipr/product-release-model.json  (committed; not gitignored)
+  model          Print the model agents should use (committed file if present).
+  model --write  Create model only if missing. Refuses to clobber without --force.
+  model --force  Required with --write to replace an existing committed model.
+
+Config file:  .shipr/product-release-model.json  (committed; not gitignored)  ← SOURCE OF TRUTH
 Ledger:       .shipr/release-attempts/           (committed)
-Sibling:      testr (.testr/) created if missing — test_commands become proofs
+Sibling:      testr (.testr/) — test_commands become proofs when shipr proofs empty
+
+Agent workflow:
+  1. shipr model --project . --json     # reads committed model; does NOT re-ceremony
+  2. YOU run proof_commands (path-relevant only)
+  3. shipr attempt --goal "…" --status shipped --proof "…" --json
 `, shipr.Version)
 }
 
@@ -66,6 +81,7 @@ func main() {
 	project := "."
 	asJSON := false
 	write := false
+	force := false
 	desc := ""
 	goal := ""
 	status := "planned"
@@ -81,6 +97,8 @@ func main() {
 			asJSON = true
 		case "--write":
 			write = true
+		case "--force":
+			force = true
 		case "--check":
 			check = true
 		case "--project":
@@ -126,14 +144,30 @@ func main() {
 
 	switch cmd {
 	case "model":
-		model := shipr.DetectReleaseModel(project, desc)
+		// Committed model wins. Detect only when no file (or when forcing a rewrite).
+		var model shipr.ReleaseModel
+		var source string
+		if force && write {
+			model = shipr.DetectReleaseModel(project, desc)
+			source = "detected"
+			model["model_source"] = "detected"
+		} else {
+			model, source = shipr.ResolveReleaseModel(project, desc)
+		}
 		if write {
-			path, err := shipr.WriteReleaseModel(project, model)
+			path, err := shipr.WriteReleaseModelForced(project, model, force)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
 			model["written_to"] = path
+			model["model_source"] = source
+			if force {
+				model["model_source"] = "detected"
+				model["write_mode"] = "forced_replace"
+			} else {
+				model["write_mode"] = "created"
+			}
 		}
 		printOut(model, asJSON)
 	case "attempt":

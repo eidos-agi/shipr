@@ -1,70 +1,67 @@
 ---
 name: use-shipr
-description: Use when the user wants to ship, release, publish, deploy, package, list in a marketplace, or learn how a product ships over time. Shipr stores AI config + release memory — it does not run deploy/ship itself.
+description: >
+  Use when the user wants to ship, release, publish, deploy, package, or learn
+  how a product ships. Shipr stores AI config + release memory — it does not
+  run deploy/ship itself. Prefer committed product models over auto-detect.
 ---
 
 # Use Shipr
 
-Shipr is **AI shipping config + release memory**. It does **not** ship, deploy, or
-run proofs. You read the model, run proofs yourself, then record the attempt.
+Shipr is **AI shipping config + release memory**. It does **not** ship, deploy,
+or run proofs. You load the product model, run proofs yourself, then record.
 
-## Start with the product model
+## 2027 kickstart (do this order)
 
 ```bash
-shipr model --project . --write --json
-shipr frontier --project . --json
+# 1. LOAD committed model — never lead with blind --write
+shipr model --project . --json
+# Look for model_source: "committed". That file is product policy.
+
+# 2. YOU run path-relevant proof_commands from the model only
+
+# 3. Record
+shipr attempt --project . \
+  --goal "…" \
+  --status planned|ready|blocked|shipped|rolled_back \
+  --proof "…" \
+  --json
 ```
 
-The model tells you:
+### Hard rules
 
-- repository visibility, license, open-source status
-- artifact types and distribution channels
-- **proof_commands** (run these yourself)
-- human approval gates and rollback paths
-- forge companions + learning questions
-- **related_testr** — when `.testr/` exists, proofs come from testr
+1. **Committed `.shipr/product-release-model.json` wins.** If present, obey it.
+2. **Do not** run `shipr model --write` on a repo that already has a model
+   unless the human asked to regenerate (`--force`).
+3. **Do not** invent blanket CI, staging, or full-suite proofs when the model
+   (or product `docs/release-loop.md` / ADR) says production-only / relevant-only.
+4. **Detection is greenfield only.** `model_source: "detected"` means “edit me
+   and commit,” not “this is finished product policy.”
+5. Production deploy / public publish require **explicit human approval** this session.
 
-## Prefer testr first
+## Prefer testr first when both exist
+
+```bash
+testr model --project . --json
+shipr model --project . --json
+```
+
+## Greenfield only
 
 ```bash
 testr model --project . --write --json
-shipr model --project . --write --json   # proof_source: testr
-```
-
-## Record every attempt (ledger only)
-
-```bash
-# After YOU run the proofs:
-shipr attempt --project . \
-  --goal "ship the next release" \
-  --status planned|ready|blocked|shipped|rolled_back \
-  --proof "go test ./..." \
-  --json
+shipr model --project . --write --json
+# Then hand-edit thin proofs/channels, commit, never re-detect without --force
 ```
 
 ## Install
 
 ```bash
 go install github.com/eidos-agi/shipr/cmd/shipr@latest
+shipr version   # expect 0.4.0+
 ```
-
-## Approval boundary
-
-Stop before public tags, package publishes, production deploys, credentials,
-payments, and outbound announcements unless the user explicitly approves.
 
 ## Tracked config
 
-`.shipr/` and `.testr/` are committed product config. Tools strip ignore rules and create missing sibling models on write.
-
-## Methods (absorbed from ship-forge)
-
-Read playbooks under `docs/methods/` (ship-check, ship-init, ship-release, …)
-and templates under `templates/`. Before `shipr attempt --status shipped`, apply
-**ship-check discipline**: clean tree, proofs from the model actually run by you,
-human gates for public tag/publish/deploy.
-
-## Registry
-
-forge-forge lists **shipr** as the active shipping operator; **ship-forge** is
-`status: retired` with `successor: shipr`.
+`.shipr/` and `.testr/` are committed product config. Tools refuse to overwrite
+existing models without `--force`.
